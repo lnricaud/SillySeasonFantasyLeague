@@ -18,6 +18,7 @@ $ git clone https://github.com/larskris/SillySeasonFantasyLeague
 $ cd SillySeasonFantasyLeague
 $ bower install
 $ rake db:create
+$ rake db:migrate
 $ rails server
 ```
 Check the output for the localhost port in your terminal.
@@ -89,8 +90,9 @@ In a browser go to "localhost:xxxx" (xxxx is the port number)
 * Has many players
 * Has many logs
 
-###### Attribute
+###### Attributes
 - league_name
+- user_id (admin)
 
 ## Wire frames described
 1. **Landing page** has login and signup buttons, some information (rules etc.) and possibly an area with related news.
