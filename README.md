@@ -9,6 +9,24 @@
 * Transfer fee goes to selling manager or is lost if player was a free agent.
 * Buying and paying salaries wastes money.
 
+## Quick setup
+Make sure that you are running Postgres.  
+
+In a terminal execute the following:
+```
+$ git clone https://github.com/larskris/SillySeasonFantasyLeague
+$ cd SillySeasonFantasyLeague
+$	rake db:create
+$ bower install
+$ rails server
+```
+Check the output for the localhost port in your terminal.
+
+In a browser go to "localhost:xxxx" (xxxx is the port number)
+
+
+
+
 ## User stories
 ### A user can ...
 * create an account and log in. 
