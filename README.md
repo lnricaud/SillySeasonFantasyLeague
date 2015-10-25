@@ -16,8 +16,8 @@ In a terminal execute the following:
 ```
 $ git clone https://github.com/larskris/SillySeasonFantasyLeague
 $ cd SillySeasonFantasyLeague
-$	rake db:create
 $ bower install
+$ rake db:create
 $ rails server
 ```
 Check the output for the localhost port in your terminal.
