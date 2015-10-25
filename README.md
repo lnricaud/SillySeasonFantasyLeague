@@ -28,51 +28,41 @@
 
 ## Models
 #### User model  
-##### Relationships
-* Has many players
-* Has many logs
-* Belongs to league
+Relationships | Attributes
+Has many players | team_name
+Has many logs | league_id
+Belongs to league | user_name
 
-##### Attributes
-- team_name
-- league_id
-- user_name
 
 #### Player model
-##### Relationships
-* Belongs to user
-* Belongs to league
-* Has many logs
+| Relationships | Attributes |
+| Belongs to user | data (json data from official API) |
+| Belongs to league | value |
+| Has many logs | user_id |
+| 	| league_id |
 
-##### Attributes
-- data (json data from official API)
-- value
-- user_id
-- league_id
 
 #### Log model
-##### Relationships
-* Belongs to user
-* Belongs to player
-* Belongs to league
+Relationships | Attributes
+Belongs to user
+Belongs to player
+Belongs to league
 
-##### Attributes
-- user_id
-- player_id
-- league_id
-- text (message)
-- action (related to text field, should be a set of allowed actions e.g. bought, sold, bid)
-- value (of transfer fee or bid)
-- game_week_id (1 - 38)
+user_id
+player_id
+league_id
+text (message)
+action (related to text field, should be a set of allowed actions e.g. bought, sold, bid)
+value (of transfer fee or bid)
+game_week_id (1 - 38)
 
 #### League model
-##### Relationships
-* Has many users
-* Has many players
-* Has many logs
+Relationships | Attribute
+Has many users
+Has many players
+Has many logs
 
-##### Attribute
-- league_name
+league_name
 
 ## Wire frames described
 1. **Landing page** has login and signup buttons, some information (rules etc.) and possibly an area with related news.
