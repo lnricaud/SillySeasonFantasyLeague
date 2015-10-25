@@ -32,6 +32,7 @@
 * Has many players
 * Has many logs
 * Belongs to league
+
 ##### Attributes
 - team_name
 - league_id
@@ -42,6 +43,7 @@
 * Belongs to user
 * Belongs to league
 * Has many logs
+
 ##### Attributes
 - data (json data from official API)
 - value
@@ -53,6 +55,7 @@
 * Belongs to user
 * Belongs to player
 * Belongs to league
+
 ##### Attributes
 - user_id
 - player_id
@@ -67,6 +70,7 @@
 * Has many users
 * Has many players
 * Has many logs
+
 ##### Attribute
 - league_name
 
