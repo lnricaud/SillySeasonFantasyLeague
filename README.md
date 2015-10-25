@@ -28,26 +28,32 @@
 
 ## Models
 #### User model  
+##### Relationships
 * Has many players
 * Has many logs
 * Belongs to league
+##### Attributes
 - team_name
 - league_id
 - user_name
 
 #### Player model
+##### Relationships
 * Belongs to user
 * Belongs to league
 * Has many logs
+##### Attributes
 - data (json data from official API)
 - value
 - user_id
 - league_id
 
 #### Log model
+##### Relationships
 * Belongs to user
 * Belongs to player
 * Belongs to league
+##### Attributes
 - user_id
 - player_id
 - league_id
@@ -57,9 +63,11 @@
 - game_week_id (1 - 38)
 
 #### League model
+##### Relationships
 * Has many users
 * Has many players
 * Has many logs
+##### Attribute
 - league_name
 
 ## Wire frames described
