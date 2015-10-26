@@ -1,1 +1,13 @@
-<p>teams show</p>
+<% if @user.league %>
+	<h1>@user.league.name</h1>
+	<%= @user.name %>
+	<%= @user.league %>
+<% else %>
+	<h1>Join a league</h1>
+	<%= render 'partials/league_form' %>
+
+<% end %>
+
+
+
+

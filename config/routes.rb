@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
 
+  get 'leagues/create'
+
   root "welcome#index"
 
+  post "/leagues", to: "leagues#create"
   get "teams/:id", to: "teams#show", as: "team"
   
   # users routes
