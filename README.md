@@ -16,7 +16,7 @@ In a terminal execute the following:
 ```
 $ git clone https://github.com/larskris/SillySeasonFantasyLeague
 $ cd SillySeasonFantasyLeague
-$ bower install
+$ bundle install
 $ rake db:create
 $ rake db:migrate
 $ rails server
