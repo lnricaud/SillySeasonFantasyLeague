@@ -1,13 +1,9 @@
-<% if @user.league %>
-	<h1>@user.league.name</h1>
-	<%= @user.name %>
-	<%= @user.league %>
-<% else %>
-	<h1>You need to join or create a league</h1>
-  <%= button_to "Create New League", new_league_path, method: "get", class: "btn btn-default" %>
-  <br>
-  <%= button_to "Join a League", leagues_path, method: "get", class: "btn btn-default" %>
-<% end %>
+<h1><%= @user.league.league_name %></h1>
+<%= @user.name %>
+<%= @user.team_name %>
+
+
+
 
 
 

@@ -37,18 +37,29 @@ class LeaguesController < ApplicationController
 		@users = @league.users
 		@admin = User.find(@league.user_id)
 	end
-  def update
-    user_id = params[:id]
-    p "params: #{params}, user_id: #{user_id}"
-    user = User.find(user_id)
+  # def update
+  #   user_id = params[:id]
+  #   p "params: #{params}, user_id: #{user_id}"
+  #   user = User.find(user_id)
 
-    # get updated data
-    updated_attributes = params.require(:user).permit(:league_id)
-    # update the user
-    user.update_attributes(updated_attributes)
+  #   # get updated data
+  #   updated_attributes = params.require(:user).permit(:league_id)
+  #   # update the user
+  #   user.update_attributes(updated_attributes)
 
-    #redirect to show
-    redirect_to "/teams/#{user.id}"
+  #   #redirect to show
+  #   redirect_to "/teams/#{user.id}"
+  # end
+  def join
+  	p "join league params: #{params}"
+
+  	# p "params['league']['league_name'] #{params["league"]["league_name"]}"
+  	@user = current_user
+  	p "@user.id #{@user.id}"
+  	p "@league.id #{params["id"]}"
+  	updated_attributes = {:league_id => params["id"]}
+  	@user.update_attributes(updated_attributes)
+		redirect_to "/teams/#{@user.id}" 
   end
 	
 	private

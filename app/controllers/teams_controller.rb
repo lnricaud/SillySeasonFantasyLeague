@@ -5,6 +5,10 @@ class TeamsController < ApplicationController
 		@user = User.find(id)
 		# @current_user = current_user
 		# @league = League.new if @user.league_id.nil?
-		render :show
+		if @user.league_id.nil?
+			render :index
+		else
+			render :show
+		end
 	end
 end
