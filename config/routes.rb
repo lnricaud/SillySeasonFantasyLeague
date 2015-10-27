@@ -15,4 +15,6 @@ Rails.application.routes.draw do
   get "/sign_in", to: "sessions#new"  
   post "/sessions", to: "sessions#create"
   delete "/sessions", to: "sessions#destroy", as: "logout"
+# players routes
+  get "/players/refresh", to: "players#refresh", as: "refresh"
 end
