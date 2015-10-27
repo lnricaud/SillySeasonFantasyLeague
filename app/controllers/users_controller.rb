@@ -20,8 +20,8 @@ class UsersController < ApplicationController
 			redirect_to "/users/new"
 		else
 			login(@user)
-			p "/teams/#{@user.id}"
-			redirect_to "/teams/#{@user.id}" 
+			p "Redirecting #{@user.name} to leagues page"
+			redirect_to "/leagues/new" 
 		end
 	end
 

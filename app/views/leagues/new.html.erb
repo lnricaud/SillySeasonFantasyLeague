@@ -1,0 +1,17 @@
+<h2>Create a league</h2>
+<%= form_for @league do |f| %> 
+	<p>
+		<%= f.text_field :league_name, placeholder: 'League Name', :maxlength => 16 %><br>
+		<% #f.password_field :password, placeholder: 'Password' %>
+		<% #f.password_field :password_confirmation, placeholder: 'Password Confirmation' %>
+		<% #f.text_field :user_id,  => @user.id %>
+		<%= f.submit "Create League!" %>
+	</p>
+<% end %> 
+
+<% @leagues.each do |league| %>
+	<div class="">
+	  <span><%= link_to league.league_name, league_path(league)%><span> <br>                
+	</div>
+<% end%>
+

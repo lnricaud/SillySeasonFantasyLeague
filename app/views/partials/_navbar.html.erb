@@ -1,7 +1,7 @@
 <nav class="navbar navbar-default navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
-      <%= link_to current_user.league_id ? current_user.league.name : "Silly Season Fantasy League", "/", :"data-no-turbolink" => true, class: "navbar-brand" %>  
+      <%= link_to "Silly Season Fantasy League", "/", :"data-no-turbolink" => true, class: "navbar-brand" %>  
     </div>
     <% if current_user %>
       <%= button_to "Logout", logout_path, method: "delete", class: "red btn btn-default navbar-right navbar-btn" %>

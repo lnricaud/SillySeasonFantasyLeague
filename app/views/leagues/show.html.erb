@@ -1,0 +1,8 @@
+<h1>Join <%= @league.league_name %></h1>
+<h2>Created by <%= @admin.name %></h2>
+<h3>Teams in League</h3>
+<% @users.each do |user| %>
+	<p><%= user.name %></p>
+<% end %>
+
+
