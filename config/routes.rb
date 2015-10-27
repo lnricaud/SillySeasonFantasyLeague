@@ -6,7 +6,8 @@ Rails.application.routes.draw do
   get "/leagues/:id", to: "leagues#show", as: "league"
   get "/leagues/:id/join", to: "leagues#join", as: "join"
 # teams routes
-  get "teams/:id", to: "teams#show", as: "team"
+  post "/teams", to: "teams#tname"
+  get "/teams/:id", to: "teams#show", as: "team"
 # users routes
   get "/users/new", to: "users#new", as: "new_user"
   post "/users", to: "users#create"

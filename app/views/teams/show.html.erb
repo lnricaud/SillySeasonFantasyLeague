@@ -1,6 +1,9 @@
 <h1><%= @user.league.league_name %></h1>
-<%= @user.name %>
-<%= @user.team_name %>
+
+<h3>Teams in League</h3>
+<% @users.each do |user| %>
+	<p><%= user.name %> - <%= (user.team_name || "NO NAME YET")%></p>
+<% end %>
 
 
 

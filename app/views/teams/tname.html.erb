@@ -1,0 +1,7 @@
+<h1><%= @user.league.league_name %></h1>
+<%= form_tag(teams_path) do %> 
+	<p>
+		<%= text_field_tag "team_name", nil, placeholder: "Choose a Team name", maxlength: 16 %>
+		<%= submit_tag "Set Team Name!" %>
+	</p>
+<% end %> 

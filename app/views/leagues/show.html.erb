@@ -1,9 +1,12 @@
 <h1>Join <%= @league.league_name %></h1>
 <p>Created by <%= @admin.name %></p>
-<%= button_to "Join This League", join_path(@league), method: "get", class: "btn btn-default" %>
+<div class="">
+	<%= button_to "Join This League", join_path(@league), method: "get", class: "btn btn-default inline-block" %>
+	<%= button_to "Back", new_league_path, method: "get", class: "btn btn-default inline-block" %>
+</div>
 <h3>Teams in League</h3>
 <% @users.each do |user| %>
-	<p><%= user.name %></p>
+	<p><%= user.name %> - <%= (user.team_name || "NO NAME YET")%></p>
 <% end %>
 
 

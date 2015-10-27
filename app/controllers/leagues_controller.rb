@@ -11,6 +11,7 @@ class LeaguesController < ApplicationController
 			render :new
 		end
 	end
+
 	def create
 		@user = current_user
 		p @user
@@ -25,34 +26,22 @@ class LeaguesController < ApplicationController
 			p "ERROR! League not created!"
 			redirect_to "/leagues/new"
 		else
-			# login(@league)
-			user_league_id
+			updated_attributes = {:league_id => @league.id}
+			@user.update_attributes(updated_attributes)
 			p "/teams/#{@user.id}"
 			redirect_to "/teams/#{@user.id}" 
 		end
 	end
+
 	def show
 		id = params[:id]
 		@league = League.find(id)
 		@users = @league.users
 		@admin = User.find(@league.user_id)
 	end
-  # def update
-  #   user_id = params[:id]
-  #   p "params: #{params}, user_id: #{user_id}"
-  #   user = User.find(user_id)
 
-  #   # get updated data
-  #   updated_attributes = params.require(:user).permit(:league_id)
-  #   # update the user
-  #   user.update_attributes(updated_attributes)
-
-  #   #redirect to show
-  #   redirect_to "/teams/#{user.id}"
-  # end
   def join
   	p "join league params: #{params}"
-
   	# p "params['league']['league_name'] #{params["league"]["league_name"]}"
   	@user = current_user
   	p "@user.id #{@user.id}"
@@ -61,16 +50,6 @@ class LeaguesController < ApplicationController
   	@user.update_attributes(updated_attributes)
 		redirect_to "/teams/#{@user.id}" 
   end
-	
-	private
-	def user_league_id
-		p "updating users league_id ..."
-		p "@user #{@user.name}"
-		p "@league #{@league.league_name}"
-		updated_attributes = {:league_id => @league.id}
-		@user.update_attributes(updated_attributes)
-		p "@user after league_id update: #{@user}"
-	end
 
 end
 
