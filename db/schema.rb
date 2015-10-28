@@ -36,7 +36,6 @@ ActiveRecord::Schema.define(version: 20151027225155) do
 
   create_table "playerdata", force: :cascade do |t|
     t.string   "data"
-    t.integer  "json_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -56,6 +55,7 @@ ActiveRecord::Schema.define(version: 20151027225155) do
     t.string   "password_digest"
     t.string   "team_name"
     t.integer  "league_id"
+    t.integer  "money"
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
   end

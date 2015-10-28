@@ -12,6 +12,7 @@ class UsersController < ApplicationController
 
 	def create
 		user_params = params.require(:user).permit(:name, :email, :league_id, :password)
+		user_params[:money] = 100000000
 		p "CREATING A USER #{user_params}"
 		@user = User.create(user_params)
 		p "User created? #{!@user.nil?}, #{@user.id}"

@@ -29,7 +29,8 @@ class LeaguesController < ApplicationController
 			updated_attributes = {:league_id => @league.id}
 			@user.update_attributes(updated_attributes)
 			p "/teams/#{@user.id}"
-			redirect_to "/teams/#{@user.id}" 
+			create_league_players 
+			redirect_to "/teams/#{@user.id}"
 		end
 	end
 
@@ -50,6 +51,11 @@ class LeaguesController < ApplicationController
   	@user.update_attributes(updated_attributes)
 		redirect_to "/teams/#{@user.id}" 
   end
-
+  private
+  def create_league_players
+  	1.upto(Playerdata.count) do |i|
+  		Player.create({league_id: @league.id, playerdata_id: i, value: 100000000})
+  	end
+  end
 end
 
