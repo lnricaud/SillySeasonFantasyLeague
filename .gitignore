@@ -48,3 +48,4 @@ bower.json
 public/uploads
 tmp
 logs
+.env
