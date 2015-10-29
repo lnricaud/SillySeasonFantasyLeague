@@ -4,7 +4,7 @@
       <%= link_to "Silly Season Fantasy League", "/", :"data-no-turbolink" => true, class: "navbar-brand" %>  
     </div>
     <% if current_user && current_user.league %>
-      <%= button_to "Players", "/", method: "get", class: "btn btn-default navbar-btn", form_class: "inline" %>
+      <%= button_to "Players", players_path, method: "get", class: "btn btn-default navbar-btn", form_class: "inline" %>
     <% end %>
     <% if current_user %>
       <%= button_to "Logout", logout_path, method: "delete", class: "red btn btn-default navbar-btn", form_class: "inline" %>

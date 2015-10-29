@@ -17,4 +17,6 @@ Rails.application.routes.draw do
   delete "/sessions", to: "sessions#destroy", as: "logout"
 # players routes
   get "/players/refresh", to: "players#refresh", as: "refresh"
+  get "/players/players", to: "players#players", as: "players"
+  get "/players/:id", to: "players#player", as: "player"
 end

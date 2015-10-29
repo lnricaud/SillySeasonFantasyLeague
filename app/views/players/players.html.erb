@@ -1,0 +1,10 @@
+<div class="">
+<% @player_data.each do |player| %>
+	<%= link_to player["web_name"], player_path( player["id"] )%>
+	<%= player["first_name"]%> 
+	<%= player["last_name"]%>
+	<%= player["team_name"]%>
+	<%= player["type_name"]%>
+	<br>                
+<% end%>
+</div>

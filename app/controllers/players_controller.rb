@@ -17,7 +17,8 @@ class PlayersController < ApplicationController
 				Playerdata.create(data: player_data)
 				p "Adding new Player to all Leagues"
 				1.upto(League.count) do |l|
-					Player.create({league_id: l, playerdata_id: i, value: 100000000})
+					pl = Player.create({league_id: l, playerdata_id: i, value: 100000000})
+					p "Created player: #{pl}"
 				end
 			else
 				p "Uppdating existing playerdata.data"
@@ -29,5 +30,22 @@ class PlayersController < ApplicationController
 		# byebug
 		redirect_to "/" 
 	end
+	def players
+		@user = current_user
+		@players = Player.where(league_id: @user.league_id)
+		@playerdata = Playerdata.all unless defined? @playerdata
+	 	@player_data = @playerdata.map {|player| JSON.parse(player.data)}
+		# byebug
+		render :players
+	end
+	def player # show player data
+		p "Showing player, params: #{params}"
+		@player = Player.find_by_id(params[:id])
+		p @player
+		@player_data = JSON.parse(@player.playerdata.data)
+		p @player_data
+		render :player
+	end
+
 
 end
