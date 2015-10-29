@@ -1,13 +1,13 @@
-<nav class="navbar navbar-default navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
+<nav class="navbar navbar-default">
+  <div class="container">
+    <div class="">
       <%= link_to "Silly Season Fantasy League", "/", :"data-no-turbolink" => true, class: "navbar-brand" %>  
     </div>
     <% if current_user %>
-      <%= button_to "Logout", logout_path, method: "delete", class: "red btn btn-default navbar-right navbar-btn" %>
+      <%= button_to "Logout", logout_path, method: "delete", class: "red btn btn-default navbar-btn", form_class: "inline" %>
     <% else %>
-	    <%= button_to "Login", sign_in_path, method: "get", class: "btn btn-default navbar-right navbar-btn" %>
-	    <%= button_to "Sign Up", new_user_path, method: "get", class: "btn btn-default navbar-right navbar-btn" %>
+	    <%= button_to "Login", sign_in_path, method: "get", class: "btn btn-default navbar-btn", form_class: "inline" %>
+	    <%= button_to "Sign Up", new_user_path, method: "get", class: "btn btn-default navbar-btn", form_class: "inline" %>
 	  <% end %>
   </div>
 </nav>
