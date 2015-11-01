@@ -112,6 +112,7 @@ See all routes in terminal with command: $ rake routes
 
 root url goes to welcome controller and the index method (welcome#index).
 
+*Controller*  
 **welcome#index**
 
 1. Displays a message if user not logged in.
@@ -119,8 +120,9 @@ root url goes to welcome controller and the index method (welcome#index).
 If logged in: 
 
 2. Redirects to team page if user is logged in and belongs to a league.
-3. Otherwise it redirects user to leagues#new
+3. Otherwise redirects user to leagues#new
 
+*Controller*  
 **leagues#new**
 
 1. Checks if user is logged in, redirects to sign_in if not.
@@ -131,14 +133,17 @@ If logged in:
 3. Creates a list of all existing leagues in variable @leagues for user to join.
 4. Renders view ./app/views/leagues/new.html.erb
 
-./app/views/**leagues/new.html.erb**
-Submit button posts to leagues#create
+*View*  
+./app/views/**leagues/new.html.erb**  
+Submit button posts to leagues#create  
+*Controller*
 **leagues#create**
 
 1. League is created and user is updated in db to belong to created league
 2. Redirected to team page
 
-Clicking on a league redirects to leagues#show with league id in params
+Clicking on a league redirects to leagues#show with league id in params  
+*Controller*  
 **leagues#show**
 
 3. @league is found in the db by id
@@ -146,17 +151,20 @@ Clicking on a league redirects to leagues#show with league id in params
 5. @admin is defined in the League schema in user_id column.
 6. Renders ./app/views/leagues/show.html.erb
 
+*View*  
 ./app/views/**leagues/show.html.erb**
 Lists creator of league and all teams and managers
 
 1. Back button redirects back to ./app/views/leagues/new.html.erb
 2. Join button redirects to leagues#join and passes on the league id in params
 
+*Controller*  
 **leagues#join**
 
 1. Updates user.league_id in db
 2. Redirects to team page
 
+*Controller*  
 **teams#show**
 
 1. Checks if user logged in, if now redirects to login/signup page
