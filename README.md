@@ -101,22 +101,32 @@ In a browser go to "localhost:xxxx" (xxxx is the port number)
 
 
 ## App flow chart
+
 Controllers are located in ./app/controllers/
-controller#method
 
 Routes are defined in ./**config/routes.rb**
+
 VERB "URL path", to: "controller#method", as: "optional_alias" (optional alias path accessed by adding _path i.e. "optional_alias_path"
+
 See all routes in terminal with command: $ rake routes
 
 root url goes to welcome controller and the index method (welcome#index).
+
 **welcome#index**
-1. Displays a message if user not logged in
-If logged in: 2. Redirects to team page if user is logged in and belongs to a league.
+
+1. Displays a message if user not logged in.
+
+If logged in: 
+
+2. Redirects to team page if user is logged in and belongs to a league.
 3. Otherwise it redirects user to leagues#new
 
 **leagues#new**
+
 1. Checks if user is logged in, redirects to sign_in if not.
+
 If logged in: 
+
 2. Prepares @league if user wants to create new league
 3. Creates a list of all existing leagues in variable @leagues for user to join.
 4. Renders view ./app/views/leagues/new.html.erb
@@ -124,10 +134,13 @@ If logged in:
 ./app/views/**leagues/new.html.erb**
 Submit button posts to leagues#create
 **leagues#create**
+
 1. League is created and user is updated in db to belong to created league
 2. Redirected to team page
+
 Clicking on a league redirects to leagues#show with league id in params
 **leagues#show**
+
 3. @league is found in the db by id
 4. @users is an array of users who belongs to that league. Relationship defined in leagues.rb and users.rb models. User schema has league_id as int column.
 5. @admin is defined in the League schema in user_id column.
@@ -135,16 +148,22 @@ Clicking on a league redirects to leagues#show with league id in params
 
 ./app/views/**leagues/show.html.erb**
 Lists creator of league and all teams and managers
+
 1. Back button redirects back to ./app/views/leagues/new.html.erb
 2. Join button redirects to leagues#join and passes on the league id in params
 
 **leagues#join**
+
 1. Updates user.league_id in db
 2. Redirects to team page
 
 **teams#show**
+
 1. Checks if user logged in, if now redirects to login/signup page
-If logged in: 2. @league, @users created for view
+
+If logged in: 
+
+2. @league, @users created for view
 3. Checks if user has chosen a team name, if not redirects to ./app/views/teams/tname.html.erb
 ./app/views/**teams/tname.html.erb**
 Submit button posts to teams#tname where User.team_name is updated in the db.
