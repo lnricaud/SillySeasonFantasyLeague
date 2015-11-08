@@ -143,7 +143,7 @@ Lists creator of league and all teams and managers
 2. Redirects to team page
 
 **teams#show**
-1. Checks if user logged in, if now redirects to login/signup page
+1. Checks if user logged in, if no redirects to login/signup page
 If logged in: 2. @league, @users created for view
 3. Checks if user has chosen a team name, if not redirects to ./app/views/teams/tname.html.erb
 ./app/views/**teams/tname.html.erb**
