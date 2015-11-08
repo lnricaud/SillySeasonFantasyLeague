@@ -63,7 +63,7 @@ class LeaguesController < ApplicationController
 			if @user.team_name.nil?
 				@names = @users.map {|name| (name.team_name unless name.team_name.nil?) }
 				p "names: #{@names}"
-				redirect_to "/teams/name"
+				redirect_to "/teams/index"
 			else
 				render :show
 			end
