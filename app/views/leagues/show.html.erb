@@ -1,12 +1,13 @@
-<h1>Join <%= @league.league_name %></h1>
-<p>Created by <%= @admin.name %></p>
-<div class="">
-	<%= button_to "Join This League", join_path(@league), method: "get", class: "btn btn-default", form_class: "inline"%>
-	<%= button_to "Back", new_league_path, method: "get", class: "btn btn-default inline", form_class: "inline" %>
-</div>
+<h1><%= @user.league.league_name %></h1>
+
 <h3>Teams in League</h3>
 <% @users.each do |user| %>
 	<p><%= user.name %> - <%= (user.team_name || "NO NAME YET")%></p>
 <% end %>
+
+
+
+
+
 
 

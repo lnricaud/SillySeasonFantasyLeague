@@ -8,7 +8,7 @@
 <h2>Or join an existing league</h2>
 <% @leagues.each do |league| %>
 	<div class="">
-	  <span><%= link_to league.league_name, league_path(league)%><span> <br>                
+	  <span><%= link_to league.league_name, view_path(league)%><span> <br>                
 	</div>
 <% end%>
 
