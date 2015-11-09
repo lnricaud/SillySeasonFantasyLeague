@@ -2,7 +2,7 @@
 
 <h3>Teams in League</h3>
 <% @users.each do |user| %>
-	<p><%= user.name %> - <%= (user.team_name || "NO NAME YET")%></p>
+	<p><%= user.name %> - <%= link_to (user.team_name || "NO NAME YET"), team_path(:team => user.id) %></p>
 <% end %>
 
 

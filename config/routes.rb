@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 # teams routes
   get "/teams/index", to: "teams#index"
   post "/teams", to: "teams#name"
+  get "/teams", to: "teams#show", as: "team"
 # users routes
   get "/users/new", to: "users#new", as: "new_user"
   post "/users", to: "users#create"
@@ -20,4 +21,7 @@ Rails.application.routes.draw do
   get "/players/refresh", to: "players#refresh", as: "refresh"
   get "/players/players", to: "players#players", as: "players"
   get "/players/:id", to: "players#player", as: "player"
+# transfer routes
+  get "/transfers", to: "transfers#index", as: "transfers"
+
 end

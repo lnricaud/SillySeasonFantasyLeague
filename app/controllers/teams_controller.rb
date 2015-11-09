@@ -12,4 +12,15 @@ class TeamsController < ApplicationController
 		redirect_to "/leagues/#{@user.id}" 
 	end
 
+	def show
+		p "In teams#show, params: #{params}"
+		p "Team ID: #{params[:team]}"
+		@manager = User.find_by_id(params[:team])
+		@players = @manager.players # connect data to players
+		@data = Playerdata.all # make global and update in players#refresh
+		# @players.map {|player| player[:data] = @data[]}
+		# @playerData = @players.each {|player| }
+		render :show
+	end
+
 end
