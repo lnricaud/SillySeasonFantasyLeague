@@ -71,8 +71,6 @@ class LeaguesController < ApplicationController
 		end
 	end
 
-
-
   private
   def create_league_players
   	1.upto(Playerdata.count) do |i|

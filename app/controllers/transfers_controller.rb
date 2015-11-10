@@ -2,17 +2,22 @@ class TransfersController < ApplicationController
 	def index
 		@user = current_user
 		@league = @user.league
+		
+		# create player_data from players helper functions
 		@players = @league.players
+		p "@players.count: #{@players.count}"
+		
 		@users = @user.league.users
 		@teams = Hash.new
 		p "--- STARTS HERE ---"
-		@users.map do |user|
+		@users.each do |user|
 			p "user: #{user}"
 			p user.id
 			@teams[user.id] = user.players
-
+		end
 		# byebug
-		end 
+		p "@teams: #{@teams}"
+		render :index
 	end
 
 	def newgameweek # changes to next gameweek
