@@ -26,7 +26,7 @@ class TransfersController < ApplicationController
 	end
 
 	def stoptransfers
-		Log.
+		Log.all
 		Log.create({action: "stoptransfers", game_week: current_gameweek})
 	end
 

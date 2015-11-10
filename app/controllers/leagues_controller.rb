@@ -54,15 +54,16 @@ class LeaguesController < ApplicationController
   end
 
 	def show
-		@user = User.find(params[:id])
+		@user = current_user
 		if @user.league_id.nil?
 			render :index
 		else
-			@league = League.find(@user.league_id)
+			@league = @user.league
 			@users = @league.users
+			@names = @users.map {|name| (name.team_name unless name.team_name.nil?) }
+			p "names: #{@names}"
+			p "Team name: #{@user.team_name}"
 			if @user.team_name.nil?
-				@names = @users.map {|name| (name.team_name unless name.team_name.nil?) }
-				p "names: #{@names}"
 				redirect_to "/teams/index"
 			else
 				render :show
