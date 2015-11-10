@@ -23,5 +23,7 @@ Rails.application.routes.draw do
   get "/players/:id", to: "players#player", as: "player"
 # transfer routes
   get "/transfers", to: "transfers#index", as: "transfers"
+  get "/transfers/stop", to: "transfers#stop", as: "stop"
+  get "/transfers/newgameweek", to: "transfers#newgameweek", as: "newgameweek"
 
 end

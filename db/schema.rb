@@ -24,12 +24,12 @@ ActiveRecord::Schema.define(version: 20151027225155) do
   end
 
   create_table "logs", force: :cascade do |t|
+    t.string   "action"
+    t.integer  "game_week"
     t.integer  "user_id"
     t.integer  "player_id"
     t.integer  "league_id"
-    t.integer  "action"
     t.integer  "value"
-    t.integer  "game_week"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
