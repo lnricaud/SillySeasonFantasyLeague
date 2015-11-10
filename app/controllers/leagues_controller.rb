@@ -28,13 +28,14 @@ class LeaguesController < ApplicationController
 		else
 			updated_attributes = {:league_id => @league.id}
 			@user.update_attributes(updated_attributes)
-			p "/teams/#{@user.id}"
+			p "/leagues/#{@user.id}"
 			create_league_players 
-			redirect_to "/teams/#{@user.id}"
+			redirect_to "/leagues/#{@user.id}"
 		end
 	end
 
-	def show
+	def view # preview of league to join
+		p "in leagues#view, params: #{params}"
 		id = params[:id]
 		@league = League.find(id)
 		@users = @league.users
@@ -49,8 +50,27 @@ class LeaguesController < ApplicationController
   	p "@league.id #{params["id"]}"
   	updated_attributes = {:league_id => params["id"]}
   	@user.update_attributes(updated_attributes)
-		redirect_to "/teams/#{@user.id}" 
+		redirect_to "/leagues/#{params["id"]}" 
   end
+
+	def show
+		@user = current_user
+		if @user.league_id.nil?
+			render :index
+		else
+			@league = @user.league
+			@users = @league.users
+			@names = @users.map {|name| (name.team_name unless name.team_name.nil?) }
+			p "names: #{@names}"
+			p "Team name: #{@user.team_name}"
+			if @user.team_name.nil?
+				redirect_to "/teams/index"
+			else
+				render :show
+			end
+		end
+	end
+
   private
   def create_league_players
   	1.upto(Playerdata.count) do |i|

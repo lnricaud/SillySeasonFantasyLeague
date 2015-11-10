@@ -16,6 +16,7 @@ class PlayersController < ApplicationController
 				p "Creating new Playerdata"
 				Playerdata.create(data: player_data)
 				p "Adding new Player to all Leagues"
+				Log.create(action: "newPlayer", game_week: current_gameweek, player_id: i)
 				1.upto(League.count) do |l|
 					pl = Player.create({league_id: l, playerdata_id: i, value: 100000000})
 					p "Created player: #{pl}"

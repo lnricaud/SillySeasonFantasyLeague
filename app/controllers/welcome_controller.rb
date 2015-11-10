@@ -5,7 +5,7 @@ class WelcomeController < ApplicationController
   		if @user.league_id.nil?
 	    	redirect_to "/leagues/new"
 	    else
-	    	redirect_to "/teams/#{@user.id}"
+	    	redirect_to "/leagues/#{@user.id}"
 	    end
   	else
   		render :index

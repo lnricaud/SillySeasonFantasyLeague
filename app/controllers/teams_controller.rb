@@ -1,26 +1,26 @@
 class TeamsController < ApplicationController
-	def show
-		@user = User.find(params[:id])
-		if @user.league_id.nil?
-			render :index
-		else
-			@league = League.find(@user.league_id)
-			@users = @league.users
-			if @user.team_name.nil?
-				@tnames = @users.map {|tname| (tname.team_name unless tname.team_name.nil?) }
-				p "tnames: #{@tnames}"
-				render :tname
-			else
-				render :show
-			end
-		end
+	def index
+		@user = current_user
+		render :name 
 	end
 
-	def tname
-		p "params in tname: #{params}"
+	def name
+		p "params in name: #{params}"
 		updated_attributes = {:team_name => params["team_name"]}
 		@user = current_user
 		@user.update_attributes(updated_attributes)
-		redirect_to "/teams/#{@user.id}" 
+		redirect_to "/leagues/#{@user.id}" 
 	end
+
+	def show
+		p "In teams#show, params: #{params}"
+		p "Team ID: #{params[:team]}"
+		@manager = User.find_by_id(params[:team])
+		@players = @manager.players # connect data to players
+		@data = Playerdata.all # make global and update in players#refresh
+		# @players.map {|player| player[:data] = @data[]}
+		# @playerData = @players.each {|player| }
+		render :show
+	end
+
 end
