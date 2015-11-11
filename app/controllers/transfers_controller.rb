@@ -37,6 +37,6 @@ class TransfersController < ApplicationController
 
 	private
 	def calc_points
-
+# to be called when new game week starts
 	end
 end
