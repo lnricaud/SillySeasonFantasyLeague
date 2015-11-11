@@ -5,7 +5,6 @@ class CreatePlayers < ActiveRecord::Migration
       t.integer :value
       t.integer :user_id
       t.integer :league_id
-
       t.timestamps null: false
     end
   end

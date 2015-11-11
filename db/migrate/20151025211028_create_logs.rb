@@ -7,7 +7,6 @@ class CreateLogs < ActiveRecord::Migration
       t.integer :player_id
       t.integer :league_id
       t.integer :value
-
       t.timestamps null: false
     end
   end

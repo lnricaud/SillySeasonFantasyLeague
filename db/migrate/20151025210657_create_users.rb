@@ -7,7 +7,6 @@ class CreateUsers < ActiveRecord::Migration
       t.string :team_name
       t.integer :league_id
       t.integer :money
-
       t.timestamps null: false
     end
   end
