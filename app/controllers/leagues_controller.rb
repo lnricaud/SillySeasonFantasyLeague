@@ -56,7 +56,7 @@ class LeaguesController < ApplicationController
 	def show
 		@user = current_user
 		if @user.league_id.nil?
-			render :index
+			redirect_to "/leagues/new"
 		else
 			@league = @user.league
 			@users = @league.users

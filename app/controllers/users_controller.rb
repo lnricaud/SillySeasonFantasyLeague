@@ -33,6 +33,37 @@ class UsersController < ApplicationController
 		render :show
 	end
 
+	def quicklogin # to be used for testing
+		p "in user#quicklogin, params[:email]: #{params[:email]}"
+		# logout current user
+		destroy # sessions_helper function
+		email = "#{params[:email]}@test.com"
+		# check if user exists
+		@user = User.find_by email: email
+		if @user.nil? # create
+			u_params = {email: email, password: "qwe", money: 100000000}
+			case email
+			when "kl@test.com"
+				u_params[:name] = "Kristian"
+				u_params[:team_name] = "IFK Götebord"
+			when "pn@test.com"
+				u_params[:name] = "Patrik"
+				u_params[:team_name] = "Arsenal"
+			when "jl@test.com"
+				u_params[:name] = "Johan"
+				u_params[:team_name] = "Liverpool"
+			else
+				u_params[:name] = "Peter"
+				u_params[:team_name] = "ManU"
+			end
+			p "Creating quicklogin user: #{u_params}"
+			@user = User.create(u_params)
+		end
+		# login
+		login(@user)
+		redirect_to "/leagues/#{@user.id}"
+	end
+
 	# def edit
 	# 	id = params[:id]
 	# 	@user = User.find(id)

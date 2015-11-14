@@ -12,7 +12,9 @@ Rails.application.routes.draw do
   get "/teams", to: "teams#show", as: "team"
 # users routes
   get "/users/new", to: "users#new", as: "new_user"
-  post "/users", to: "users#create"
+  get "/users/quicklogin/:email", to: "users#quicklogin", as: "quicklogin"
+  post "/users/", to: "users#create"
+
 # sessions routes
   get "/sign_in", to: "sessions#new"  
   post "/sessions", to: "sessions#create"
