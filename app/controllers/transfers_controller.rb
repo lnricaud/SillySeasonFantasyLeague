@@ -4,26 +4,15 @@ class TransfersController < ApplicationController
 		@user = current_user
 		@league = @user.league
 		@users = @league.users
-		players = @league.players
-		p "players.count: #{players.count}"
 		parsedata unless defined? $data
-		@players = players.map do |player| 
-			{player.id => {
-				data: $data[player.id],
-				value: player.value,
-				user: player.user_id,
-				league: player.league_id
-			}}
-				byebug
-		end
-		p "@players after adding data #{@players}"
+		mergeplayerdata # create @players
 		@teams = Hash.new
 		@users.each do |user|
 			p "user: #{user}"
 			p user.id
 			@teams[user.id] = user.players
 		end
-		byebug
+		# byebug
 		p "@teams: #{@teams}"
 		render :index
 	end
