@@ -29,13 +29,13 @@ class PlayersController < ApplicationController
 			i += 1
 		end
 		# byebug
+		parsedata
 		redirect_to "/" 
 	end
 	def players
 		@user = current_user
 		@players = Player.where(league_id: @user.league_id)
-		@playerdata = Playerdata.all unless defined? @playerdata
-	 	@player_data = @playerdata.map {|player| JSON.parse(player.data)}
+	 	@player_data = parsedata unless defined? $data # update view later to accept @data instead of @player_data, also change so the it uses keys instead of json
 		# byebug
 		render :players
 	end

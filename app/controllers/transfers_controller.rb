@@ -1,21 +1,29 @@
 class TransfersController < ApplicationController
 	def index
+		require 'json'
 		@user = current_user
 		@league = @user.league
-		
-		# create player_data from players helper functions
-		@players = @league.players
-		p "@players.count: #{@players.count}"
-		
-		@users = @user.league.users
+		@users = @league.users
+		players = @league.players
+		p "players.count: #{players.count}"
+		parsedata unless defined? $data
+		@players = players.map do |player| 
+			{player.id => {
+				data: $data[player.id],
+				value: player.value,
+				user: player.user_id,
+				league: player.league_id
+			}}
+				byebug
+		end
+		p "@players after adding data #{@players}"
 		@teams = Hash.new
-		p "--- STARTS HERE ---"
 		@users.each do |user|
 			p "user: #{user}"
 			p user.id
 			@teams[user.id] = user.players
 		end
-		# byebug
+		byebug
 		p "@teams: #{@teams}"
 		render :index
 	end

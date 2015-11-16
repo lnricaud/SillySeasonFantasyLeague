@@ -45,7 +45,7 @@ class UsersController < ApplicationController
 			case email
 			when "kl@test.com"
 				u_params[:name] = "Kristian"
-				u_params[:team_name] = "IFK Götebord"
+				u_params[:team_name] = "IFK Göteborg"
 			when "pn@test.com"
 				u_params[:name] = "Patrik"
 				u_params[:team_name] = "Arsenal"
