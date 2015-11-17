@@ -4,6 +4,7 @@ module TransfersHelper
 	end
 
 	def transfers_active?
-		Log.where(game_week: current_gameweek, action: "newgameweek")
+		log = Log.where(game_week: current_gameweek, action: "newgameweek")
+		p "transfers_active? #{log}"
 	end
 end
