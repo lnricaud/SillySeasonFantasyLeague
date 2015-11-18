@@ -2,8 +2,8 @@ Rails.application.routes.draw do
   root "welcome#index"
 # leagues routes
   get "/leagues/new", to: "leagues#new", as: "new_league"
-  get "/leagues/:id/view", to: "leagues#view", as: "view"
   get "/leagues/:id", to: "leagues#show", as: "league"
+  get "/leagues/:id/view", to: "leagues#view", as: "view"
   get "/leagues/:id/join", to: "leagues#join", as: "join"
   post "/leagues", to: "leagues#create"
 # teams routes
@@ -25,7 +25,7 @@ Rails.application.routes.draw do
   get "/players/:id", to: "players#player", as: "player"
 # transfer routes
   get "/transfers", to: "transfers#index", as: "transfers"
-  get "/transfers/stop", to: "transfers#stop", as: "stop"
+  get "/transfers/stoptransfers", to: "transfers#stoptransfers", as: "stop"
   get "/transfers/newgameweek", to: "transfers#newgameweek", as: "newgameweek"
 
 end

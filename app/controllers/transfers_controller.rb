@@ -8,12 +8,8 @@ class TransfersController < ApplicationController
 		mergeplayerdata # create @players
 		@teams = Hash.new
 		@users.each do |user|
-			p "user: #{user}"
-			p user.id
 			@teams[user.id] = user.players
 		end
-		# byebug
-		p "@teams: #{@teams}"
 		render :index
 	end
 
@@ -28,8 +24,10 @@ class TransfersController < ApplicationController
 	end
 
 	def stoptransfers
-		Log.all
-		Log.create({action: "stoptransfers", game_week: current_gameweek})
+		p "in stop transfers"
+		log = Log.create(action: "stoptransfers", game_week: current_gameweek)
+		p "log created: #{log}"
+		redirect_to "/transfers"
 	end
 
 	private
