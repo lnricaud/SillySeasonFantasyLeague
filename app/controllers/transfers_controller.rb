@@ -4,7 +4,7 @@ class TransfersController < ApplicationController
 		@user = current_user
 		@league = @user.league
 		@users = @league.users
-		parsedata unless defined? $data
+		parsedata unless defined? $data # does not need to be updated
 		mergeplayerdata # create @players
 		@teams = Hash.new
 		@users.each do |user|

@@ -41,19 +41,23 @@ module PlayersHelper
 				saves: player["saves"],
 				bonus: player["bonus"],
 				season_history: player["season_history"] # array
+				# some data excluded from the official api data
 			}
 		end
 	end
 
 	def mergeplayerdata
-		$players = Hash.new unless defined? $players
-		players = @league.players
-		players.each do |player|
-			$players[player.id] = $data[player.id]
-			$players[player.id][:league] = player.league_id
-			$players[player.id][:user] = player.user_id
-			$players[player.id][:value] = player.value
+		$leagues = Hash.new unless defined? $leagues
+		players = Hash.new
+		league_players = @league.players
+		league_players.each do |player|
+			players[player.id] = $data[player.id]
+			players[player.id][:league] = player.league_id
+			players[player.id][:user] = player.user_id
+			players[player.id][:value] = player.value
+			$leagues[@league.id] = players
 		end
+
 	end
 
 end
