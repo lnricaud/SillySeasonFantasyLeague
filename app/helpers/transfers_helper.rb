@@ -4,7 +4,6 @@ module TransfersHelper
 	end
 
 	def transfers_active?
-		log = Log.where(game_week: current_gameweek, action: "newgameweek")
-		p "transfers_active? #{log}"
+		!Log.exists?({game_week: current_gameweek, action: "stoptransfers"})
 	end
 end

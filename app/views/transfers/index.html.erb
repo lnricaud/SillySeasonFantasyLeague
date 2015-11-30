@@ -13,8 +13,23 @@
 	<p>Manager: <%= user.name %></p>
 	<p>Team: <%= user.team_name %></p>
 	<p>Players:</p>
-	<% @teams[user.id].each do |player| %>
-		<p>- <%= player %></p>
+	<% if @teams.length > 0 %>
+		<% @teams[user.id].each do |player| %>
+			<p>- <%= player %></p>
+		<% end %>
+	<% end %>
+<% end %>
+<hr>
+<h2>Available players</h2>
+<% if @freeplayers.length > 0 # clean this up, make it possible to filter%>
+	<% @freeplayers.each do |id| # goes through a list of player ids %>
+		<% player = @players[id] %>
+		<p>* <%= player[:first_name] %> <%= player[:last_name] %>, <%= player[:team_name] %>, <%= player[:position]%></p>
+		<p>-- Points: <%= player[:total_points].to_s %>, gw points: <%= player[:gw_points].to_s %>, fixture: <%= player[:current_fixture] %>, chance of playing: <%= player[:gw_plays].to_s %>%</p>
+		<p>-- Price: <%= number_with_precision(player[:value]/1000000.0, precision: 2) %> Million</p>
+<!-- button to buy player -->
+		<%= button_to "Bid on Player", bid_path(id), method: "get", class: "btn btn-inverse", form_class: "inline"%>
 
+		<hr>
 	<% end %>
 <% end %>

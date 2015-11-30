@@ -74,7 +74,7 @@ class LeaguesController < ApplicationController
   private
   def create_league_players
   	1.upto(Playerdata.count) do |i|
-  		Player.create({league_id: @league.id, playerdata_id: i, value: 100000000})
+  		Player.create({league_id: @league.id, playerdata_id: i, value: 4000000})
   	end
   end
 end

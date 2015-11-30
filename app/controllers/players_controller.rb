@@ -10,7 +10,7 @@ class PlayersController < ApplicationController
 			  p "Found last element, breaking out of loop"
 			  break  
 			end  
-			p player_data["id"]
+			# p player_data["id"]
 			db_data = Playerdata.find_by_id(i)
 			if db_data.nil?
 				p "Creating new Playerdata"
@@ -18,8 +18,8 @@ class PlayersController < ApplicationController
 				p "Adding new Player to all Leagues"
 				Log.create(action: "newPlayer", game_week: current_gameweek, player_id: i)
 				1.upto(League.count) do |l|
-					pl = Player.create({league_id: l, playerdata_id: i, value: 100000000})
-					p "Created player: #{pl}"
+					pl = Player.create({league_id: l, playerdata_id: i, value: 4000000})
+					p "Created player: #{pl[:id]}"
 				end
 			else
 				p "Uppdating existing playerdata.data"
