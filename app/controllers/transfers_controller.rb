@@ -10,7 +10,8 @@ class TransfersController < ApplicationController
 		p "PETER IN INDEX: #{@players[3]}"
 		@teams = Hash.new
 		@users.each do |user|
-			@teams[user.id] = user.players.map {|player| player.id} unless user.players
+			@teams[user.id] = user.players.map {|player| player.id} unless user.players.count == 0
+
 		end
 		boughtplayers = @teams.values.flatten
 		@freeplayers = Array (1..$leagues[@user.league_id].length)

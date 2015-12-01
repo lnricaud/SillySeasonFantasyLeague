@@ -2,34 +2,25 @@
 <p>Current gameweek: <%= current_gameweek %></p>
 <p>Transfers active? <%= transfers_active? %></p>
 
-
-
-
 <%= button_to "Stop Transfers (simulation purpose)", stop_path(), method: "get", class: "btn btn-inverse", form_class: "inline"%>
 <%= button_to "End GW (simulation purpose)", newgameweek_path(), method: "get", class: "btn btn-inverse", form_class: "inline"%>
+
 <h1>Transfers</h1>
 <% @users.each do |user| %>
 	<hr>
 	<p>Manager: <%= user.name %></p>
 	<p>Team: <%= user.team_name %></p>
-	<p>Players:</p>
-	<% if @teams.length > 0 %>
-		<% @teams[user.id].each do |player| %>
-			<p>- <%= player %></p>
+	<h3>Players:</h3>
+	<% unless @teams[user.id].nil? %>
+		<% @teams[user.id].each do |id| %>
+			<%= render 'partials/player', id: id %>
 		<% end %>
 	<% end %>
 <% end %>
 <hr>
-<h2>Available players</h2>
+<h2>Free agents</h2>
 <% if @freeplayers.length > 0 # clean this up, make it possible to filter%>
 	<% @freeplayers.each do |id| # goes through a list of player ids %>
-		<% player = @players[id] %>
-		<p>* <%= player[:first_name] %> <%= player[:last_name] %>, <%= player[:team_name] %>, <%= player[:position]%></p>
-		<p>-- Points: <%= player[:total_points].to_s %>, gw points: <%= player[:gw_points].to_s %>, fixture: <%= player[:current_fixture] %>, chance of playing: <%= player[:gw_plays].to_s %>%</p>
-		<p>-- Price: <%= number_with_precision(player[:value]/1000000.0, precision: 2) %> Million</p>
-<!-- button to buy player -->
-		<%= button_to "Bid on Player", bid_path(id), method: "get", class: "btn btn-inverse", form_class: "inline"%>
-
-		<hr>
+		<%= render 'partials/player', id: id %>
 	<% end %>
 <% end %>
