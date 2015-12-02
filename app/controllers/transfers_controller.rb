@@ -38,14 +38,32 @@ class TransfersController < ApplicationController
 
 	def bid
 		p "in transfers#bid, params: #{params}"
+		bid = params[:bid].to_f * 1000000
+		p "bid value: #{params[:bid]}"
 		user = current_user
 		@player = Player.where(id: params[:id], league_id: user.league_id).first
-		newValue = @player.value + 100000
+		
+#\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+		# check for highest bid and increase it with 100k if new bid is higher, if not increase current owners price to what current bid was.
+		
+		highestBid = Log.where(player_id: 1, league_id: 1, action: "bid").order("value DESC").first
+		if highestBid.length == 0
+			newValue = @player.value + 100000
+		else
+			if highestBid.value < bid
+				# bid buys player
+			else
+				# bid increases value for current owner
+			end
+		end
 		updated_attributes = {value: newValue, user_id: user.id}
 		@player.update_attributes(updated_attributes)
 		$leagues[user.league_id][@player.id][:value] = newValue
-		p ""
-		# log = Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: params[:id], league_id: user.league_id, value: @players[]
+		
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+		log = Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: params[:id], league_id: user.league_id, value: bid.to_i)
 		
 		redirect_to "/transfers"
 	end
