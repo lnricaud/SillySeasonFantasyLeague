@@ -38,33 +38,39 @@ class TransfersController < ApplicationController
 
 	def bid
 		p "in transfers#bid, params: #{params}"
-		bid = params[:bid].to_f * 1000000
+		bid = params[:bid].to_i
 		p "bid value: #{params[:bid]}"
 		user = current_user
-		@player = Player.where(id: params[:id], league_id: user.league_id).first
+		league = user.league
+		player = Player.where(id: params[:id], league_id: user.league_id).first
+		owner = player.user
 		
 #\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 		# check for highest bid and increase it with 100k if new bid is higher, if not increase current owners price to what current bid was.
 		
-		highestBid = Log.where(player_id: 1, league_id: 1, action: "bid").order("value DESC").first
-		if highestBid.length == 0
-			newValue = @player.value + 100000
+		highestBid = Log.where(player_id: player.id, league_id: league.id, action: "bid").order("value DESC").first
+		Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: league.id, value: bid)
+		if highestBid.nil? # player has never been bought
+			value = player.value + 100000
+			updated_attributes = {value: value, user_id: user.id}
 		else
-			if highestBid.value < bid
+			if bid > highestBid.value
 				# bid buys player
+				if bid < highestBid.value + 100000
+					value = bid
+				else
+					value = highestBid.value + 100000
+				end
+					updated_attributes = {value: value, user_id: user.id, owned: nil}
 			else
 				# bid increases value for current owner
+				updated_attributes = {value: bid}
 			end
+			player.update_attributes(updated_attributes)		
 		end
-		updated_attributes = {value: newValue, user_id: user.id}
-		@player.update_attributes(updated_attributes)
-		$leagues[user.league_id][@player.id][:value] = newValue
-		
+		player.update_attributes(updated_attributes)
+		$leagues[user.league_id][player.id][:value] = value
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-		log = Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: params[:id], league_id: user.league_id, value: bid.to_i)
-		
 		redirect_to "/transfers"
 	end
 

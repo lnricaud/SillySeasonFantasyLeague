@@ -2,11 +2,11 @@
 <% player = @players[id] %>
 <p>* <%= player[:first_name] %> <%= player[:last_name] %>, <%= player[:team_name] %>, <%= player[:position]%></p>
 <p>-- Points: <%= player[:total_points].to_s %>, gw points: <%= player[:gw_points].to_s %>, fixture: <%= player[:current_fixture] %>, chance of playing: <%= player[:gw_plays].to_s %>%</p>
-<% value = number_with_precision(player[:value]/1000000.0, precision: 2) %>
+<% #value = number_with_precision(player[:value]/1000000.0, precision: 2) %>
 <p>-- Owned: <%= player[:owned] ? "Yes, owner might increase salary to keep player" : "No, highest bid will aquire player" %></p>
-<p>-- Value: <%= value %> Million</p>
+<p>-- Value: <%= player[:value] %></p>
 <!-- button to buy player -->
 <%= form_tag(bid_path(id), method: "get") do %>
-	<%= number_field_tag :bid, value, min: value, step: 0.1, size: 10 %>
+	<%= number_field_tag :bid, player[:value], min: player[:value], step: 100000, length: 12 %>
 	<%= submit_tag("Bid") %>
 <% end %>
