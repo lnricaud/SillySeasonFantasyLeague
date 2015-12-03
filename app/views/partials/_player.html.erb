@@ -6,8 +6,22 @@
 <p>-- Owned: <%= player[:owned] ? "Yes, owner might increase salary to keep player" : "No, highest bid will aquire player" %></p>
 <p>-- Value: <%= player[:value] %></p>
 <!-- button to buy player -->
-<% value = player[:value] + (player[:user].nil? ? 0 : 100000) %>
+<% if player[:user].nil? %>
+	<% value = player[:value] %>
+<% elsif player[:user] == @user.id %>
+	<% value = player[:topbid] %>
+<% else %>
+	<% value = player[:value] + 100000 %>
+<% end %>
 <%= form_tag(bid_path(id), method: "get") do %>
-	<%= number_field_tag :bid, value, min: value, step: 100000, length: 12 %>
-	<%= submit_tag("Bid") %>
+	<%= number_field_tag :bid, value, min: player[:user] == @user.id ? player[:value] : value, step: 100000, length: 12 %>
+	<%= submit_tag("#{player[:user] == @user.id ? "Change Top Salary" : "Bid"}") %>
+<% end %>
+
+
+<% if player[:user] == @user.id %>
+	<% sell_price = (player[:value] * 0.9).round %>
+	<%= form_tag(sell_path(id, sell_price), method: "get") do %>
+		<%= submit_tag("Sell player for #{sell_price}") %>
+	<% end %> 
 <% end %>

@@ -46,15 +46,15 @@ class TransfersController < ApplicationController
 		owner = player.user
 		
 #\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-		# check for highest bid and increase it with 100k if new bid is higher, if not increase current owners price to what current bid was.
-			
-
 		highestBid = Log.where(player_id: player.id, league_id: league.id, action: "bid").order("value DESC").first
 		Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: league.id, value: bid)
-		unless user == owner
+		if user == owner
+			highestBid.update_attributes({value: bid})
+			updated_attributes = {topbid: bid}
+		else
 			if highestBid.nil? # player has never been bought
 				value = player.value
-				updated_attributes = {value: value, user_id: user.id}
+				updated_attributes = {value: value, user_id: user.id, topbid: bid}
 			else
 				if bid > highestBid.value
 					# bid buys player
@@ -63,17 +63,24 @@ class TransfersController < ApplicationController
 					else
 						value = highestBid.value + 100000
 					end
-						updated_attributes = {value: value, user_id: user.id, owned: nil}
+					updated_attributes = {value: value, user_id: user.id, owned: nil, topbid: bid}
 				else
 					# bid increases value for current owner
 					updated_attributes = {value: bid}
 				end
 				player.update_attributes(updated_attributes)		
 			end
-			player.update_attributes(updated_attributes)
 			$leagues[user.league_id][player.id][:value] = value
 		end
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+		player.update_attributes(updated_attributes)
+#\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+		redirect_to "/transfers"
+	end
+
+	def sell
+		# update player to have user_id nil
+		# if player was owned refund 90%
+		# else subtract 10% of player value
 		redirect_to "/transfers"
 	end
 

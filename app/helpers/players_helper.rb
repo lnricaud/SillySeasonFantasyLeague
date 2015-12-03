@@ -56,6 +56,7 @@ module PlayersHelper
 			players[player.id][:user] = player.user_id
 			players[player.id][:value] = player.value
 			players[player.id][:owned] = player.owned
+			players[player.id][:topbid] = player.topbid
 			$leagues[@league.id] = players
 		end
 
