@@ -8,9 +8,8 @@
 <h1>Transfers</h1>
 <% @users.each do |user| %>
 	<hr>
-	<p>Manager: <%= user.name %></p>
-	<p>Team: <%= user.team_name %></p>
-	<h3>Players:</h3>
+	<h3>Manager: <%= user.name %></h3>
+	<h3>Team: <%= user.team_name %></h3>
 	<% unless @teams[user.id].nil? %>
 		<% @teams[user.id].each do |id| %>
 			<%= render 'partials/player', id: id %>
