@@ -10,6 +10,7 @@
 	<hr>
 	<h3>Manager: <%= user.name %></h3>
 	<h3>Team: <%= user.team_name %></h3>
+	<h4>Money: <%= user.money %></h4>
 	<% unless @teams[user.id].nil? %>
 		<% @teams[user.id].each do |id| %>
 			<%= render 'partials/player', id: id %>
