@@ -21,7 +21,7 @@
 
 <% if player[:user] == @user.id %>
 	<% sell_price = (player[:value] * 0.9).round %>
-	<%= form_tag(sell_path(id, sell_price), method: "get") do %>
-		<%= submit_tag("Sell player for #{sell_price}") %>
+	<%= form_tag sell_path(id), method: "get" do %>
+		<%= submit_tag "Sell player for #{sell_price}" %>
 	<% end %> 
 <% end %>
