@@ -20,6 +20,7 @@ class TransfersController < ApplicationController
 	end
 
 	def newgameweek # changes to next gameweek
+		set_owned_true
 		nextGW = current_gameweek + 1
 		logParams = {action: 'newgameweek', game_week: nextGW}
 		p "logParams: #{logParams}"
@@ -31,6 +32,7 @@ class TransfersController < ApplicationController
 
 	def stoptransfers
 		p "in stop transfers"
+		set_owned_true
 		log = Log.create(action: "stoptransfers", game_week: current_gameweek)
 		p "log created: #{log}"
 		redirect_to "/transfers"
@@ -72,12 +74,16 @@ class TransfersController < ApplicationController
 						profit = owner.money + value
 						owner.update_attributes(money: profit)
 					else # owner get his money back, no profit
-						owner.update_attributes(money: player.value)
+						refund = owner.money + player.value
+						owner.update_attributes(money: refund)
 					end
 				else
 					# bid increases value of player for current owner
 					value = bid
 					updated_attributes = {value: value}
+					difference = owner.money - (value - player.value)
+					p "difference: #{difference}, owner money: #{owner.money}, bid: #{value}, player value: #{player.value}"
+					owner.update_attributes(money: difference) # player value increased, owner compensating for that with the difference
 				end
 				player.update_attributes(updated_attributes)		
 			end
@@ -110,5 +116,9 @@ class TransfersController < ApplicationController
 	private
 	def calc_points
 # to be called when new game week starts
+	end
+
+	def set_owned_true
+		Players.where.not(user_id: nil).update_all(owned: true)
 	end
 end
