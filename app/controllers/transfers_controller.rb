@@ -57,7 +57,7 @@ class TransfersController < ApplicationController
 				updated_attributes = {user_id: user.id, topbid: bid}
 				fee = user.money - player.value
 				user.update_attributes(money: fee) # subtracts the value of the player from user's money
-			else
+			else # bidding on a player owned by another user
 				if bid > highestBid.value
 					# bid buys player
 					if bid < highestBid.value + 100000
@@ -66,17 +66,16 @@ class TransfersController < ApplicationController
 						value = highestBid.value + 100000
 					end
 					updated_attributes = {value: value, user_id: user.id, owned: nil, topbid: bid}
-					if player.owned
-						# should buyer pay money now or later, if not now and he is selling he'd make a profit
-						profit = user.money + value
+					fee = user.money - value
+					user.update_attributes(money: fee) # user pays for the player
+					if player.owned # owner makes a profit
+						profit = owner.money + value
 						owner.update_attributes(money: profit)
-					else
-###### FIX THIS, owner get's money back if owned false, owner get's profit if owned true
-###### How to deal with transfer fees, who get's what?
-						user.update_attributes(money: fee)
+					else # owner get his money back, no profit
+						owner.update_attributes(money: player.value)
 					end
 				else
-					# bid increases value for current owner
+					# bid increases value of player for current owner
 					value = bid
 					updated_attributes = {value: value}
 				end

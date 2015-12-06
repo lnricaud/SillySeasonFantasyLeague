@@ -26,17 +26,17 @@ Check the output for the localhost port in your terminal.
 In a browser go to "localhost:xxxx" (xxxx is the port number)
 
 
-## Rules
-### The Players model has four important fields:
+## Transfer Rules
+### For transfers the Players model has four important fields:
 * user_id: the user who owns the player
 * value: current value of player
 * topbid: current highest bid on player by current owner
-* owned: true if user has owned player over a gameweek, user cannot get a profit from player when sold if this field is false
+* owned: true if user has owned player over a gameweek, user cannot make a profit from a player when sold if this field is false
 
 
 ### Buy free agent
-	* value subtracted from user's money
-	* player marked with topbid
+* value subtracted from user's money
+* player marked with topbid
 
 
 ### Buy from other user when player is marked as not owned (player bought in the same transfer round)
