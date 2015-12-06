@@ -26,6 +26,47 @@ Check the output for the localhost port in your terminal.
 In a browser go to "localhost:xxxx" (xxxx is the port number)
 
 
+## Rules
+### The Players model has four important fields:
+* user_id: the user who owns the player
+* value: current value of player
+* topbid: current highest bid on player by current owner
+* owned: true if user has owned player over a gameweek, user cannot get a profit from player when sold if this field is false
+
+
+### Buy free agent
+	* value subtracted from user's money
+	* player marked with topbid
+
+
+### Buy from other user when player is marked as not owned (player bought in the same transfer round)
+
+- if bid larger than topbid
+	* all invested money is returned to other user, no loss or profit
+	* topbid + 100k (or bid if less than topbid + 100k) is taken from user
+	* player marked with topbid
+
+- if bid smaller than topbid
+	* value of player goes up to bid, difference is taken from other user's money
+	* player remains in other user's possession
+
+
+### Buy from other user when player is marked as owned (player bought before last game week, other user received points (if any) for player at least once)
+
+- if bid larger than topbid
+	* ownership of player change to bidding user and player is marked as not owned
+	* user pays topbid + 100k (or bid) to other user
+	* player marked with new topbid
+
+- if bid smaller than topbid
+	* value of player goes up to bid
+	* no money drawn from owner of player, increased salary will be paid instead
+
+
+### Sell player
+* player fields changed to nil, value set to 90% of previous value
+* seller receives 90% of previous value
+
 
 
 ## User stories
@@ -68,6 +109,8 @@ In a browser go to "localhost:xxxx" (xxxx is the port number)
 - value
 - user_id
 - league_id
+- owned
+- topbid
 
 #### Log model
 ###### Relationships
@@ -93,6 +136,8 @@ In a browser go to "localhost:xxxx" (xxxx is the port number)
 ###### Attributes
 - league_name
 - user_id (admin)
+
+
 
 ## Wire frames described
 1. **Landing page** has login and signup buttons, some information (rules etc.) and possibly an area with related news.
