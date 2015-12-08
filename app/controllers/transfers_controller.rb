@@ -23,13 +23,14 @@ class TransfersController < ApplicationController
 		if transfers_active?
 			set_owned_true
 			subtract_salaries
-		end 
+		end
+		calc_points
+		
 		nextGW = current_gameweek + 1
 		logParams = {action: 'newgameweek', game_week: nextGW}
 		p "logParams: #{logParams}"
 		log = Log.create(action: 'newgameweek', game_week: nextGW)
 		p log
-		calc_points
 		redirect_to "/transfers" 
 	end
 
@@ -119,7 +120,7 @@ class TransfersController < ApplicationController
 
 	private
 	def calc_points
-# to be called when new game week starts
+		getplayerpoints
 
 	end
 
@@ -128,14 +129,14 @@ class TransfersController < ApplicationController
 	end
 
 	def subtract_salaries
-		# iterate over all players that are owned and subtract the salary from owner
 		players = Player.where.not(user_id: nil)
 		salaries = players.each_with_object(Hash.new(0)) {|player, sum| sum[player.user_id] += player.value} 
 		owners = User.where(id: salaries.keys)
-		owners.each do |owner| 
-			salary = owner.money - (salaries[owner.id] * 0.1).round
-			byebug
-			owner.update_attributes(money: salary)
+		owners.each do |owner|
+			salary = (salaries[owner.id] * 0.1).round # SALARY SET HERE, currently 10% of value
+			money = owner.money - salary 
+			owner.update_attributes(money: money)
+			Log.create(action: "salaries", game_week: current_gameweek, user_id: owner.id, league_id: owner.league_id, value: salary)
 		end
 	end
 

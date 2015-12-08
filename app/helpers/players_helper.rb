@@ -41,7 +41,7 @@ module PlayersHelper
 				saves: player["saves"],
 				bonus: player["bonus"],
 				season_history: player["season_history"] # array
-				# some data excluded from the official api data
+				# some data not included here from the official api data
 			}
 		end
 	end
@@ -59,7 +59,14 @@ module PlayersHelper
 			players[player.id][:topbid] = player.topbid
 			$leagues[@league.id] = players
 		end
+	end
+	
+	def getplayerpoints
+		gw = current_gameweek
+		# get gw points for all players
+# bug, $data is at this point not correct, it contains league specific data and fixtures_played is nil
+		byebug
+		# $data.each {|player| }
 
 	end
-
 end
