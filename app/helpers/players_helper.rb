@@ -15,8 +15,8 @@ module PlayersHelper
 				current_fixture: player["current_fixture"],
 				next_fixture: player["next_fixture"],
 				news: player["news"],
-				fixtures_played: player["fixture_history"][0],
-				fixtures_last3: player["fixture_history"][1],
+				fixtures_played: player["fixture_history"]["all"],
+				fixtures_last3: player["fixture_history"]["summary"],
 				fixtures_next: player["fixtures"]["all"],
 				fixtures_next3: player["fixtures"]["summary"],
 				# gameweek stats
@@ -51,6 +51,7 @@ module PlayersHelper
 		players = Hash.new
 		league_players = @league.players
 		league_players.each do |player|
+			# this is stupid, adding the same data to all players. Refactor later on
 			players[player.id] = $data[player.id]
 			players[player.id][:league] = player.league_id
 			players[player.id][:user] = player.user_id
