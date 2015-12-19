@@ -52,13 +52,22 @@ module PlayersHelper
 		league_players = @league.players
 		league_players.each do |player|
 			# this is stupid, adding the same data to all players. Refactor later on
-			players[player.id] = $data[player.id]
-			players[player.id][:league] = player.league_id
-			players[player.id][:user] = player.user_id
-			players[player.id][:value] = player.value
-			players[player.id][:owned] = player.owned
-			players[player.id][:topbid] = player.topbid
-			$leagues[@league.id] = players
+			# players[player.id] = $data[player.id] # this is the same for all players, should not be added to each individual player
+				# league: player.league_id, # shouldn't be needed
+			playerhash = {
+				user: player.user_id,
+				value: player.value,
+				owned: player.owned,
+				topbid: player.topbid
+			}
+			p "playerhash: #{playerhash}"
+			players[player.id] = playerhash
+			# players[player.id][:league] = player.league_id
+			# players[player.id][:user] = player.user_id
+			# players[player.id][:value] = player.value
+			# players[player.id][:owned] = player.owned
+			# players[player.id][:topbid] = player.topbid
+			$leagues[player.league_id] = players
 		end
 	end
 	

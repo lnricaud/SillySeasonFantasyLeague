@@ -1,7 +1,9 @@
 <hr>
-<% player = @players[id] %>
-<p>* <%= player[:first_name] %> <%= player[:last_name] %>, <%= player[:team_name] %>, <%= player[:position]%></p>
-<p>-- Points: <%= player[:total_points].to_s %>, gw points: <%= player[:gw_points].to_s %>, fixture: <%= player[:current_fixture] %>, chance of playing: <%= player[:gw_plays].to_s %>%</p>
+<% player = @players[id] %> 
+<% player_data = $data[id] %> 
+
+<p>* <%= player_data[:first_name] %> <%= player_data[:last_name] %>, <%= player_data[:team_name] %>, <%= player_data[:position]%></p>
+<p>-- Points: <%= player_data[:total_points].to_s %>, gw points: <%= player_data[:gw_points].to_s %>, fixture: <%= player_data[:current_fixture] %>, chance of playing: <%= player_data[:gw_plays].to_s %>%</p>
 <% #value = number_with_precision(player[:value]/1000000.0, precision: 2) %>
 <p>-- Owned: <%= player[:owned] ? "Yes" : "No" %></p>
 <p>-- Value: <%= player[:value] %></p>
