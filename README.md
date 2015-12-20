@@ -138,6 +138,17 @@ In a browser go to "localhost:xxxx" (xxxx is the port number)
 - user_id (admin)
 
 
+## Logs
+Logs keep track of events. Logs are of the following kind:
+
+* newPlayer - created when new player is added to API data
+* stoptransfers - created before the first game starts, stops transfers until newgameweek has been created
+* newgameweek - created after games have been played, calculates the points for each user and activates transfers
+* gwpoints - created for each user after each game week. Shows the total points for that game week from user's players
+* bid - created when user bids on players.
+* salaries - created when transfers are blocked. 10% of the total value of user's players are subtracted from user's money.
+
+
 
 ## Wire frames described
 1. **Landing page** has login and signup buttons, some information (rules etc.) and possibly an area with related news.
