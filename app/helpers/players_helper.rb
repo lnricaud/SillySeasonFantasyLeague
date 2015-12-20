@@ -46,27 +46,18 @@ module PlayersHelper
 		end
 	end
 
-	def mergeplayerdata
+	def leagueplayers
 		$leagues = Hash.new unless defined? $leagues
 		players = Hash.new
 		league_players = @league.players
 		league_players.each do |player|
-			# this is stupid, adding the same data to all players. Refactor later on
-			# players[player.id] = $data[player.id] # this is the same for all players, should not be added to each individual player
-				# league: player.league_id, # shouldn't be needed
 			playerhash = {
 				user: player.user_id,
 				value: player.value,
 				owned: player.owned,
 				topbid: player.topbid
 			}
-			p "playerhash: #{playerhash}"
 			players[player.id] = playerhash
-			# players[player.id][:league] = player.league_id
-			# players[player.id][:user] = player.user_id
-			# players[player.id][:value] = player.value
-			# players[player.id][:owned] = player.owned
-			# players[player.id][:topbid] = player.topbid
 			$leagues[player.league_id] = players
 		end
 	end
@@ -74,9 +65,17 @@ module PlayersHelper
 	def getplayerpoints
 		gw = current_gameweek
 		# get gw points for all players
-# bug, $data is at this point not correct, it contains league specific data and fixtures_played is nil
-		byebug
-		# $data.each {|player| }
-
+		owned_players = Player.where(owned: true)
+		points = Hash.new
+		gwpoints = owned_players.each_with_object(Hash.new(0)) { |player, counts| counts[player.user_id] += $data[player.id][:fixtures_played][gw][19] }
+		# loop through gw points, create log for gw points for each user. Increase money for each user. 
+		p "GW: #{gw}, Points: #{gwpoints}"
+		users = User.all
+		gwpoints.each do |user_id, points|
+			user = users.find_by_id user_id
+			Log.create(action: 'gwpoints', game_week: gw, user_id: user_id, league_id: user.league_id, value: points)
+			money = user.money + points * 1000000
+			user.update_attributes(money: money)
+		end
 	end
 end

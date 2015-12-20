@@ -5,7 +5,7 @@ class TransfersController < ApplicationController
 		@league = @user.league
 		@users = @league.users
 		parsedata unless defined? $data # does not need to be updated
-		mergeplayerdata # adds league players to $leagues
+		leagueplayers # adds league players to $leagues
 		@players = $leagues[@league.id]
 		p "PETER IN INDEX: #{@players[3]}"
 		@teams = Hash.new
@@ -19,7 +19,7 @@ class TransfersController < ApplicationController
 		render :index
 	end
 
-	def newgameweek # changes to next gameweek
+	def newgameweek # changes to next gameweek and transfers becomes active
 		if transfers_active?
 			set_owned_true
 			subtract_salaries
@@ -27,8 +27,6 @@ class TransfersController < ApplicationController
 		calc_points
 		
 		nextGW = current_gameweek + 1
-		logParams = {action: 'newgameweek', game_week: nextGW}
-		p "logParams: #{logParams}"
 		log = Log.create(action: 'newgameweek', game_week: nextGW)
 		p log
 		redirect_to "/transfers" 
@@ -54,8 +52,6 @@ class TransfersController < ApplicationController
 #\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 		highestBid = Log.where(player_id: player.id, league_id: user.league_id, action: "bid").order("value DESC").first
 		Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: bid)
-		# Bought as Kristian but Kochielny got to Peter BUGGGGGGG/ doesn't happen again, will keep an eye out for this
-		
 		if user == owner
 			highestBid.update_attributes({value: bid})
 			updated_attributes = {topbid: bid}
