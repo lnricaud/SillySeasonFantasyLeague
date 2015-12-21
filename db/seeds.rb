@@ -24,7 +24,7 @@ Log.destroy_all
 		email = "#{lname}@#{domain}"
 		team_pre = FFaker::HealthcareIpsum.word
 		team_name = "#{team_pre.capitalize} FC"
-		data = {name: "#{fname} #{lname}", email: email, password: "qwe", team_name: team_name, league_id: league.id, money: 100000000}
+		data = {name: "#{fname} #{lname}", email: email, password: "qwe", team_name: team_name, league_id: league.id}
 		@user = User.create(data)
 		p "User #{email} | 'qwe'"
 	end

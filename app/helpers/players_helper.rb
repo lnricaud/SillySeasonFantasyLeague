@@ -76,6 +76,7 @@ module PlayersHelper
 			Log.create(action: 'gwpoints', game_week: gw, user_id: user_id, league_id: user.league_id, value: points)
 			money = user.money + points * 1000000
 			user.update_attributes(money: money)
+			
 		end
 	end
 end

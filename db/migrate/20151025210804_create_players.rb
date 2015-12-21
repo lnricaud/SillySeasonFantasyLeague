@@ -5,6 +5,8 @@ class CreatePlayers < ActiveRecord::Migration
       t.integer :value
       t.integer :user_id
       t.integer :league_id
+      t.boolean :owned, default: false
+      t.integer :topbid
       t.timestamps null: false
     end
   end

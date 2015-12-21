@@ -12,7 +12,6 @@ class UsersController < ApplicationController
 
 	def create
 		user_params = params.require(:user).permit(:name, :email, :league_id, :password)
-		user_params[:money] = 100000000
 		p "CREATING A USER #{user_params}"
 		@user = User.create(user_params)
 		p "User created? #{!@user.nil?}, #{@user.id}"
@@ -41,7 +40,7 @@ class UsersController < ApplicationController
 		# check if user exists
 		@user = User.find_by email: email
 		if @user.nil? # create
-			u_params = {email: email, password: "qwe", money: 100000000}
+			u_params = {email: email, password: "qwe"}
 			case email
 			when "kl@test.com"
 				u_params[:name] = "Kristian"

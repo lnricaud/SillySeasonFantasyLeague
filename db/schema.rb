@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151203015447) do
+ActiveRecord::Schema.define(version: 20151027225155) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,10 +45,10 @@ ActiveRecord::Schema.define(version: 20151203015447) do
     t.integer  "value"
     t.integer  "user_id"
     t.integer  "league_id"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.boolean  "owned"
+    t.boolean  "owned",         default: false
     t.integer  "topbid"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -57,9 +57,11 @@ ActiveRecord::Schema.define(version: 20151203015447) do
     t.string   "password_digest"
     t.string   "team_name"
     t.integer  "league_id"
-    t.integer  "money"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.integer  "money",           default: 100000000
+    t.integer  "gwpoints",        default: 0
+    t.integer  "totpoints",       default: 0
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
 end

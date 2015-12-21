@@ -68,7 +68,7 @@ class TransfersController < ApplicationController
 					else
 						value = highestBid.value + 100000
 					end
-					updated_attributes = {value: value, user_id: user.id, owned: nil, topbid: bid}
+					updated_attributes = {value: value, user_id: user.id, owned: false, topbid: bid}
 					fee = user.money - value
 					user.update_attributes(money: fee) # user pays for the player
 					if player.owned # owner makes a profit
@@ -99,7 +99,7 @@ class TransfersController < ApplicationController
 		p "-- In transfers#sell params: #{params}"
 		user = current_user
 		player = Player.where(id: params[:id], league_id: user.league_id).first
-		# update player to have user_id, topbid and owned nil
+		# update player to have user_id, topbid and owned false
 		value = (player.value * 0.9).round
 		# if player was owned refund 90%
 		if player.owned
@@ -110,7 +110,7 @@ class TransfersController < ApplicationController
 		end
 		Log.create(action: "sell", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: value)
 		Log.where(action: "bid", game_week: current_gameweek, player_id: player.id, league_id: user.league_id).update_all(action: "old_bid")
-		player.update_attributes(user_id: nil, value: value ,owned: nil, topbid: nil)
+		player.update_attributes(user_id: nil, value: value ,owned: false, topbid: nil)
 		redirect_to "/transfers"
 	end
 
