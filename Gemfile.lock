@@ -36,7 +36,6 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    addressable (2.4.0)
     arel (6.0.3)
     autoprefixer-rails (6.0.3)
       execjs
@@ -64,6 +63,8 @@ GEM
     ffaker (2.1.0)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
+    haml (4.0.7)
+      tilt
     i18n (0.7.0)
     jbuilder (2.3.2)
       activesupport (>= 3.0.0, < 5)
@@ -74,14 +75,20 @@ GEM
       thor (>= 0.14, < 2.0)
     json (1.8.3)
     kgio (2.10.0)
-    launchy (2.4.3)
-      addressable (~> 2.3)
-    letter_opener (1.4.1)
-      launchy (~> 2.2)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
       mime-types (>= 1.16, < 3)
+    mailcatcher (0.2.4)
+      eventmachine
+      haml
+      i18n
+      json
+      mail
+      sinatra
+      skinny (>= 0.1.2)
+      sqlite3-ruby
+      thin
     mime-types (2.6.2)
     mini_portile (0.6.2)
     minitest (5.8.1)
@@ -90,6 +97,8 @@ GEM
       mini_portile (~> 0.6.0)
     pg (0.18.3)
     rack (1.6.4)
+    rack-protection (1.5.3)
+      rack
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.4)
@@ -135,6 +144,13 @@ GEM
     sdoc (0.4.1)
       json (~> 1.7, >= 1.7.7)
       rdoc (~> 4.0)
+    sinatra (1.4.6)
+      rack (~> 1.4)
+      rack-protection (~> 1.4)
+      tilt (>= 1.3, < 3)
+    skinny (0.2.2)
+      eventmachine (~> 1.0)
+      thin
     spring (1.4.0)
     sprockets (3.4.0)
       rack (> 1, < 3)
@@ -142,6 +158,9 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
+    sqlite3 (1.3.11)
+    sqlite3-ruby (1.3.3)
+      sqlite3 (>= 1.3.3)
     thin (1.6.4)
       daemons (~> 1.0, >= 1.0.9)
       eventmachine (~> 1.0, >= 1.0.4)
@@ -178,7 +197,7 @@ DEPENDENCIES
   ffaker
   jbuilder (~> 2.0)
   jquery-rails
-  letter_opener
+  mailcatcher
   pg
   rails (= 4.2.4)
   rails_12factor

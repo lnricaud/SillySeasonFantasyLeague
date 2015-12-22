@@ -26,6 +26,13 @@ Check the output for the localhost port in your terminal.
 In a browser go to "localhost:xxxx" (xxxx is the port number)
 
 
+To catch emails from the application, start mailcatcher in terminal
+```
+$ mailcatcher
+```
+In a browser go to "http://127.0.0.1:1080" for virtual inbox
+
+
 ## Transfer Rules
 ### For transfers the Players model has four important fields:
 * user_id: the user who owns the player
