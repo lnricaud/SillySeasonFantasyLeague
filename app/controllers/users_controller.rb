@@ -20,6 +20,10 @@ class UsersController < ApplicationController
 			redirect_to "/users/new"
 		else
 			login(@user)
+# ------------------------
+	    # @booking.passengers.each { |p| PassengerMailer.thank_you_email(p).deliver! }
+		  SignupMailer.signup_mail(@user).deliver_now!
+# ------------------------
 			p "Redirecting #{@user.name} to leagues page"
 			redirect_to "/leagues/new" 
 		end
