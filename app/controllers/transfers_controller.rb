@@ -7,14 +7,15 @@ class TransfersController < ApplicationController
 		parsedata unless defined? $data # does not need to be updated
 		leagueplayers # adds league players to $leagues
 		@players = $leagues[@league.id]
-		p "PETER IN INDEX: #{@players[3]}"
 		@teams = Hash.new
 		@users.each do |user|
 			@teams[user.id] = user.players.map {|player| player.id} unless user.players.count == 0
-
 		end
-		boughtplayers = @teams.values.flatten
-		@freeplayers = Array (1..$leagues[@user.league_id].length)
+		boughtplayers = @teams.values.flatten # creates array of bought player's ids (not data id)
+		@freeplayers = @league.players.map {|player| player.id}
+
+		# @freeplayers = Array (1..$leagues[@user.league_id].length) #change this take all player ids
+		
 		@freeplayers -= boughtplayers
 		render :index
 	end

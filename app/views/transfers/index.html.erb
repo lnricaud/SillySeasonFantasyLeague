@@ -12,7 +12,7 @@
 	<h3>Team: <%= user.team_name %></h3>
 	<h4>Money: <%= user.money %></h4>
 	<% unless @teams[user.id].nil? %>
-		<% @teams[user.id].each do |id| %>
+		<% @teams[user.id].each do |id| # bug here, id should be of player, now it's always 1-640 %>
 			<%= render 'partials/player', id: id %>
 		<% end %>
 	<% end %>

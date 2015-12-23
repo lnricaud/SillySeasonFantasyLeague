@@ -52,6 +52,7 @@ module PlayersHelper
 		league_players = @league.players
 		league_players.each do |player|
 			playerhash = {
+				id: player.playerdata_id,
 				user: player.user_id,
 				value: player.value,
 				owned: player.owned,

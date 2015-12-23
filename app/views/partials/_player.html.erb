@@ -1,6 +1,6 @@
 <hr>
 <% player = @players[id] %> 
-<% player_data = $data[id] %> 
+<% player_data = $data[player[:id]] %> 
 
 <p>* <%= player_data[:first_name] %> <%= player_data[:last_name] %>, <%= player_data[:team_name] %>, <%= player_data[:position]%></p>
 <p>-- Points: <%= player_data[:total_points].to_s %>, gw points: <%= player_data[:gw_points].to_s %>, fixture: <%= player_data[:current_fixture] %>, chance of playing: <%= player_data[:gw_plays].to_s %>%</p>

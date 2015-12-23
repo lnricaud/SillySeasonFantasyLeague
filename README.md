@@ -30,7 +30,7 @@ To catch emails from the application, start mailcatcher in terminal
 ```
 $ mailcatcher
 ```
-In a browser go to "http://127.0.0.1:1080" for virtual inbox
+In a browser go to "http://127.0.0.1:1080" for virtual inboxer
 
 
 ## Transfer Rules
@@ -153,7 +153,7 @@ Logs keep track of events. Logs are of the following kind:
 * newgameweek - created after games have been played, calculates the points for each user and activates transfers
 * gwpoints - created for each user after each game week. Shows the total points for that game week from user's players
 * bid - created when user bids on players.
-* salaries - created when transfers are blocked. 10% of the total value of user's players are subtracted from user's money.
+* salaries - created when transfers are stopped. 10% of the total value of user's players are subtracted from user's money.
 
 
 
