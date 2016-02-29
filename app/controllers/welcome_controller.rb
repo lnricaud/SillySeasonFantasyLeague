@@ -1,6 +1,11 @@
 class WelcomeController < ApplicationController
   def index
-    render :json => "{hello => world}"
+    # @post = Post.find(params[:id])
+    
+    # if stale?(last_modified: @post.updated_at, public: true)
+    #   render json: @post
+    # end
+    render :json => "hello => world"
   	# @user = current_user
   	# if @user
   	# 	if @user.league_id.nil?
