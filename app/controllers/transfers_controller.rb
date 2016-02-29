@@ -3,13 +3,16 @@ class TransfersController < ApplicationController
 		require 'json'
 		@user = current_user
 		@league = @user.league
+		@userclean = {id: @user.id, name: @user.name, team_name: @user.team_name, league_id: @user.league_id, league_name: @league.league_name, money: @user.money, gwpoints: @user.gwpoints, totpoints: @user.totpoints}
 		@users = @league.users
 		parsedata unless defined? $data # does not need to be updated
 		leagueplayers # adds league players to $leagues
 		@players = $leagues[@league.id]
 		@teams = Hash.new
+		@usersclean = Hash.new
 		@users.each do |user|
 			@teams[user.id] = user.players.map {|player| player.id} unless user.players.count == 0
+			@usersclean[user.id] = {id: user.id, name: user.name, team_name: user.team_name, league_id: user.league_id, money: user.money, gwpoints: user.gwpoints, totpoints: user.totpoints}
 		end
 		boughtplayers = @teams.values.flatten # creates array of bought player's ids (not data id)
 		@freeplayers = @league.players.map {|player| player.id}
@@ -17,6 +20,23 @@ class TransfersController < ApplicationController
 		# @freeplayers = Array (1..$leagues[@user.league_id].length) #change this take all player ids
 		
 		@freeplayers -= boughtplayers
+
+		# MOCK DATA #######
+		p "@userclean ---------"
+		p @userclean
+		p "@usersclean ---"
+		p @usersclean
+		p "@players ------"
+		p @players
+		p "@teams --------"
+		p @teams
+		p "@freeplayers --"
+		p @freeplayers
+
+
+
+
+
 		render :index
 	end
 
