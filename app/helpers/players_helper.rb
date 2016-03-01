@@ -21,7 +21,6 @@ module PlayersHelper
 				fixtures_next3: player["fixtures"]["summary"],
 				# gameweek stats
 				gw_points: player["event_total"],
-				gw_details: player["event_explain"],
 				gw_plays: player["chance_of_playing_this_round"],
 				gw_plays_next: player["chance_of_playing_next_round"],
 				gw_details: player["event_explain"], # dynamic array
