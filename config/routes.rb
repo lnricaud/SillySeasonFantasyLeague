@@ -20,7 +20,7 @@ Rails.application.routes.draw do
 
 # sessions routes
   # get "/sign_in", to: "sessions#new"  
-  # post "/sessions", to: "sessions#create"
+  post "/sessions", to: "sessions#create"
   # delete "/sessions", to: "sessions#destroy", as: "logout"
 # players routes
   get "/players/refresh", to: "players#refresh", as: "refresh"
