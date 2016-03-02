@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  # match '/sessions' => 'sessions#create', via: :post
+
   root "welcome#index"
 # leagues routes
   get "/leagues/new", to: "leagues#new", as: "new_league"
@@ -17,9 +19,9 @@ Rails.application.routes.draw do
   post "/users/", to: "users#create"
 
 # sessions routes
-  get "/sign_in", to: "sessions#new"  
-  post "/sessions", to: "sessions#create"
-  delete "/sessions", to: "sessions#destroy", as: "logout"
+  # get "/sign_in", to: "sessions#new"  
+  # post "/sessions", to: "sessions#create"
+  # delete "/sessions", to: "sessions#destroy", as: "logout"
 # players routes
   get "/players/refresh", to: "players#refresh", as: "refresh"
   get "/players/players", to: "players#players", as: "players"

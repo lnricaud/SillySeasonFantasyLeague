@@ -8,6 +8,8 @@ class SessionsController < ApplicationController
 	def create
 	  user_params = params.require(:user).permit(:email, :password)
 	  @user = User.confirm(user_params)
+	  p "IN SESSIONS/CREATE =============================================="
+	  render json: "Managed to get sessions#create: #{params}"
 	  if @user
 	    login(@user)
 	    if @user.league_id.nil?
