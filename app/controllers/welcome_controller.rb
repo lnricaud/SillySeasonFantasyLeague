@@ -3,9 +3,9 @@ class WelcomeController < ApplicationController
   def index
     @user = current_user
     if @user
-      render json: [{isSignedIn: true}, {user: @user.name}]
+      render json: {isSignedIn: true, user: @user.name}
     else
-      render json: [{isSignedIn: false}]
+      render json: {isSignedIn: false}
     end
   end
 

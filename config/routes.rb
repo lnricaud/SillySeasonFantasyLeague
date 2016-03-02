@@ -5,7 +5,8 @@ Rails.application.routes.draw do
   get "/leagues/:id", to: "leagues#show", as: "league"
   get "/leagues/:id/view", to: "leagues#view", as: "view"
   get "/leagues/:id/join", to: "leagues#join", as: "join"
-  post "/leagues", to: "leagues#create"
+  get "/leagues", to: "leagues#all"
+  # post "/leagues", to: "leagues#create"
 # teams routes
   get "/teams/index", to: "teams#index"
   post "/teams", to: "teams#name"
