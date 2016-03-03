@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
 	  render :new
 	end
 
-	def create
+	def oldcreate
 	  user_params = params.require(:user).permit(:email, :password)
 	  @user = User.confirm(user_params)
 	  p "IN SESSIONS/CREATE =============================================="
@@ -26,6 +26,22 @@ class SessionsController < ApplicationController
 	  # logout
 	  session[:user_id] = nil
 	  redirect_to "/sign_in"
+	end
+
+	# JWT functions
+	def random_quote
+		render json: "IT's Working!!!"
+	end
+
+	def protected
+		p "Protected: , #{params}"
+	end
+
+	def create
+		hmac_secret = 'ngEurope rocks!'
+		payload = {name: "Kristian", id: 3}
+		token = JWT.encode payload, hmac_secret, 'HS256'
+		render json: {id_token: token}
 	end
 
 end

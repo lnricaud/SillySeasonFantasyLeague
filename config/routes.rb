@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  # match '/sessions' => 'sessions#create', via: :post
+  # JWT routes
+  get "/api/random-quote", to: "sessions#random_quote"
+  get "/api/protected/random-quote", to: "sessions#protected"
+  post "/users/", to: "users#jwtcreate"
+  post "/sessions/create", to: "sessions#create"
 
   root "welcome#index"
 # leagues routes
@@ -16,11 +20,11 @@ Rails.application.routes.draw do
 # users routes
   get "/users/new", to: "users#new", as: "new_user"
   get "/users/quicklogin/:email", to: "users#quicklogin", as: "quicklogin"
-  post "/users/", to: "users#create"
+  # post "/users/", to: "users#create"
 
 # sessions routes
   # get "/sign_in", to: "sessions#new"  
-  post "/sessions", to: "sessions#create"
+  # post "/sessions", to: "sessions#create"
   # delete "/sessions", to: "sessions#destroy", as: "logout"
 # players routes
   get "/players/refresh", to: "players#refresh", as: "refresh"
