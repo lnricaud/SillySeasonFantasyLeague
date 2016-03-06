@@ -71,11 +71,34 @@ class LeaguesController < ApplicationController
 		end
 	end
 
+	def all
+		leagues = League.all
+		leagues_json = []
+		leagues.each do |league|
+			users = league.users
+			owner = league_owner(users, league.user_id)
+			leagues_json.push({league: league, owner: owner ,users: league_users_clean(users), teams: users.length})
+		end 
+		render json: leagues_json
+	end
+
   private
   def create_league_players
   	1.upto(Playerdata.count) do |i|
   		Player.create({league_id: @league.id, playerdata_id: i, value: 4000000})
   	end
   end
+
+  def league_users_clean(users)
+  	clean_users = []
+  	users.each {|user| clean_users.push({id: user.id, email: user.email, team_name: user.team_name, money: user.money, totpoints: user.totpoints})}
+  	return clean_users
+  end
+
+  def league_owner(users, owner_id)
+  	users.each {|user| return {name: user.name, email: user.email} if user.id == owner_id}
+  	return "Glenn"
+  end
+
 end
 

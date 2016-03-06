@@ -1,11 +1,19 @@
 Rails.application.routes.draw do
+  # JWT routes
+  mount Knock::Engine => "/knock"
+  get "/api/random-quote", to: "sessions#random_quote"
+  get "/api/protected/random-quote", to: "transfers#protected"
+  post "/users/", to: "users#create"
+  post "/sessions/create", to: "sessions#create"
+
   root "welcome#index"
 # leagues routes
   get "/leagues/new", to: "leagues#new", as: "new_league"
   get "/leagues/:id", to: "leagues#show", as: "league"
   get "/leagues/:id/view", to: "leagues#view", as: "view"
   get "/leagues/:id/join", to: "leagues#join", as: "join"
-  post "/leagues", to: "leagues#create"
+  get "/leagues", to: "leagues#all"
+  # post "/leagues", to: "leagues#create"
 # teams routes
   get "/teams/index", to: "teams#index"
   post "/teams", to: "teams#name"
@@ -13,12 +21,12 @@ Rails.application.routes.draw do
 # users routes
   get "/users/new", to: "users#new", as: "new_user"
   get "/users/quicklogin/:email", to: "users#quicklogin", as: "quicklogin"
-  post "/users/", to: "users#create"
+  # post "/users/", to: "users#create"
 
 # sessions routes
-  get "/sign_in", to: "sessions#new"  
-  post "/sessions", to: "sessions#create"
-  delete "/sessions", to: "sessions#destroy", as: "logout"
+  # get "/sign_in", to: "sessions#new"  
+  # post "/sessions", to: "sessions#create"
+  # delete "/sessions", to: "sessions#destroy", as: "logout"
 # players routes
   get "/players/refresh", to: "players#refresh", as: "refresh"
   get "/players/players", to: "players#players", as: "players"
