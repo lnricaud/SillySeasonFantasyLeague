@@ -1,8 +1,9 @@
 Rails.application.routes.draw do
   # JWT routes
+  mount Knock::Engine => "/knock"
   get "/api/random-quote", to: "sessions#random_quote"
-  get "/api/protected/random-quote", to: "sessions#protected"
-  post "/users/", to: "users#jwtcreate"
+  get "/api/protected/random-quote", to: "transfers#protected"
+  post "/users/", to: "users#create"
   post "/sessions/create", to: "sessions#create"
 
   root "welcome#index"

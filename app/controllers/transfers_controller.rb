@@ -1,4 +1,18 @@
 class TransfersController < ApplicationController
+	before_action :authenticate
+
+	def protected
+    if current_user
+      # head :ok
+      p "current_user found: #{current_user}"
+      render json: "Hello!!!"
+    else
+    	# send to sign in
+    	p "current_user not found: #{current_user}"
+      head :not_found
+    end
+	end
+
 	def index
 		require 'json'
 		@user = current_user
