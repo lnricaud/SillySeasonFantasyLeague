@@ -23,7 +23,7 @@ $ rails server
 ```
 Check the output for the localhost port in your terminal.
 
-In a browser go to "localhost:xxxx" (xxxx is the port number)
+Server will run on "localhost:3001"
 
 
 To catch emails from the application, start mailcatcher in terminal
