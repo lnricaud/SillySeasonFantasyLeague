@@ -1,4 +1,6 @@
-# Silly Season Fantasy League
+# Silly Season Fantasy League - Server
+[Client repository](https://github.com/larskris/sillyseason.git)
+
 ### Fantasy League based on the official [Fantasy Premier League](http://fantasy.premierleague.com). 
 * This league is focused on league play. 
 * Each player is unique and can only play for one team. 
