@@ -1,5 +1,5 @@
 # Silly Season Fantasy League - Server
-[Client repository](https://github.com/larskris/sillyseason.git)
+[Client repository](https://github.com/larskris/sillyseason-client)
 
 ### Fantasy League based on the official [Fantasy Premier League](http://fantasy.premierleague.com). 
 * This league is focused on league play. 
