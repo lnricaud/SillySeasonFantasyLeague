@@ -91,13 +91,17 @@ class LeaguesController < ApplicationController
 
   def league_users_clean(users)
   	clean_users = []
-  	users.each {|user| clean_users.push({id: user.id, email: user.email, team_name: user.team_name, money: user.money, totpoints: user.totpoints})}
+  	users.each {|user| clean_users.push({id: user.id, name: user.name, email: user.email, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, playervalue: player_value(user.players)})}
   	return clean_users
+  end
+
+  def player_value(players)
+  	return players.inject(0) { |value, player| value + player.value }
   end
 
   def league_owner(users, owner_id)
   	users.each {|user| return {name: user.name, email: user.email} if user.id == owner_id}
-  	return "Glenn"
+  	return {name: "Glenn", email: "glenn@hysen.se"}
   end
 
 end
