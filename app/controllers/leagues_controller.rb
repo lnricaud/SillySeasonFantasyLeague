@@ -8,13 +8,16 @@ class LeaguesController < ApplicationController
 		else
 			@league = League.new
 			@leagues = League.all
+			
 			render :new
 		end
 	end
 
 	def create
-		@user = current_user
-		p @user
+		# @user = current_user
+		p "--- in leagues#create ---"
+		p "#{params}"
+		p "@user"
 		p "create league params: #{params}"
 		p "params['league']['league_name'] #{params["league"]["league_name"]}"
 		p "current_user.id #{@user.id}"

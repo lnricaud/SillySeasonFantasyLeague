@@ -5,11 +5,6 @@ class UsersController < ApplicationController
 	# 	@users = User.all
 	# 	render :index
 	# end
- 	$users = [{
-	  id: 1,
-	  username: 'gonto',
-	  password: 'gonto'
-	}];
 
 	def jwtcreate
 		p "jwtcreate: #{params}"
@@ -57,19 +52,21 @@ class UsersController < ApplicationController
 	end
 
 	def create
-		user_params = params.permit(:name, :email, :league_id, :password)
+		p "user#create, params: #{params}"
+		# {name: newLeagueManager.value, team_name: newLeagueTeamName.value, email: newLeagueEmail.value, password: newLeagueLoginPassword.value}
+		user_params = params.permit(:name, :team_name, :email, :password)
 		p "CREATING A USER #{user_params}"
-
 		@user = User.create(user_params)
-		p "User created? #{!@user.nil?}, #{@user.id}"
+		p "User created? #{!@user.id.nil?}, #{@user.id}"
 		if @user.id.nil?
 			p "ERROR! User not created!"
-			render json: "Error! User not create!"
+			# render json: "Error! User not create!"
+			render json: { error: 'User not created' }, status: :unauthorized
 		else
-			# login(@user) # this is taken care of by jwt
 		  # SignupMailer.signup_mail(@user).deliver_now!
+
 			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69'
-			payload = {name: @user.name, email: @user.email, id: @user.id}
+			payload = {id: @user.id, name: @user.name, email: @user.email, league_id: nil}
 			token = JWT.encode payload, hmac_secret, 'HS256'
 
 			p "Success! render json: {id_token: token}"
