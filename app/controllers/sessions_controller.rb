@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
 	  p "IN SESSIONS/CREATE =============================================="
 	  if @user
 	  	hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69'
-	  	payload = {name: @user.name, email: @user.email, id: @user.id, league_id: @user.league_id}
+	  	payload = {name: @user.name, email: @user.email, id: @user.id, team_name: @user.team_name, league_id: @user.league_id}
 	  	token = JWT.encode payload, hmac_secret, 'HS256'
 
 	  	p "Success! render json: {id_token: token}"
