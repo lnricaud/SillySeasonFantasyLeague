@@ -17,8 +17,8 @@ class UsersController < ApplicationController
 	  p "userScheme #{userScheme}"
 
 	  if (!userScheme[:username] || !user_params[:password])
-	  	p "You must send the username and the password"
-	    render json: "You must send the username and the password"
+	  	p "You must enter both username and the password"
+	    render json: "You must enter both username and the password"
 	  end
 	  profile = {username: userScheme[:username], password: user_params[:password]}
 	  profile[:id] = $users.length + 1

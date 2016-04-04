@@ -15,28 +15,37 @@ class LeaguesController < ApplicationController
 	end
 
 	def create
-		@user = current_user
+		user = current_user
 		p "--- in leagues#create ---"
 		p "#{params}"
-		p "@user"
+		p "user.email: #{user.email}"
 		p "create league params: #{params}"
-		p "params['league']['league_name'] #{params["league"]["league_name"]}"
-		p "current_user.id #{@user.id}"
-		league_params = {:league_name => params["league"]["league_name"], :user_id => @user.id}
+		p "current_user.id #{user.id}"
+		# league_params = {:league_name => params["league"]["league_name"], :user_id => user.id, }
+		league_params = params.permit(:league_name, :password)
+		league_params[:user_id] = user.id
 		p "CREATING A LEAGUE #{league_params}"
-		# @league = League.create(league_params)
-		p "League created? #{!@league.nil?}, #{@league.id}"
-		if @league.id.nil?
+		league = League.create(league_params)
+		p "League created? #{!league.nil?}, id: #{league.id}"
+		if league.id.nil?
 			p "ERROR! League not created!"
 			# redirect_to "/leagues/new"
-			render json: {response: "League not created: #{params}"}
+			render json: {error: "League not created: #{params}"}, status: :unprocessable_entity
 		else
-			updated_attributes = {:league_id => @league.id}
-			# @user.update_attributes(updated_attributes)
-			p "/leagues/#{@user.id}"
-			# create_league_players 
+			updated_attributes = {:league_id => league.id}
+			user.update_attributes(updated_attributes)
+			p "user.league_id: #{user.league_id}"
+			create_league_players(league.id)
+
 			# redirect_to "/leagues/#{@user.id}"
-			render json: {response: "League created: #{updated_attributes}"}
+			# Create new token that includes the 
+			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69'
+			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
+			p "payload: #{payload}"
+			token = JWT.encode payload, hmac_secret, 'HS256'
+
+			p "Success! render json: {id_token: token}"
+			render json: {id_token: token} 
 		end
 	end
 
@@ -113,9 +122,9 @@ class LeaguesController < ApplicationController
 	end
 
   private
-  def create_league_players
+  def create_league_players(id)
   	1.upto(Playerdata.count) do |i|
-  		Player.create({league_id: @league.id, playerdata_id: i, value: 4000000})
+  		Player.create({league_id: id, playerdata_id: i, value: 4000000})
   	end
   end
 
