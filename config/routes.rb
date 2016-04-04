@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   get "/leagues/:id/view", to: "leagues#view", as: "view"
   get "/leagues/:id/join", to: "leagues#join", as: "join"
   get "/leagues", to: "leagues#all" # used by Angular 2 for getting all leagues
+  post "/leagues/create", to: "leagues#create"
   # post "/leagues", to: "leagues#create"
 # teams routes
   get "/teams/index", to: "teams#index"

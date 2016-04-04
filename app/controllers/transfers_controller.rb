@@ -2,13 +2,14 @@ class TransfersController < ApplicationController
 	before_action :authenticate
 
 	def protected
-    if current_user
+    user = current_user
+    if user
       # head :ok
-      p "current_user found: #{current_user}"
+      p "current_user found: #{user.email}"
       render json: "Hello!!!"
     else
     	# send to sign in
-    	p "current_user not found: #{current_user}"
+    	p "current_user not found"
       head :not_found
     end
 	end

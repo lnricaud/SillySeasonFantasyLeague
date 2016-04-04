@@ -1,5 +1,6 @@
 class LeaguesController < ApplicationController
-	
+	# before_action :authenticate
+
 	def new
 		p "IN LEAGUES NEW -----------"
 		@user = current_user
@@ -14,6 +15,32 @@ class LeaguesController < ApplicationController
 	end
 
 	def create
+		@user = current_user
+		p "--- in leagues#create ---"
+		p "#{params}"
+		p "@user"
+		p "create league params: #{params}"
+		p "params['league']['league_name'] #{params["league"]["league_name"]}"
+		p "current_user.id #{@user.id}"
+		league_params = {:league_name => params["league"]["league_name"], :user_id => @user.id}
+		p "CREATING A LEAGUE #{league_params}"
+		# @league = League.create(league_params)
+		p "League created? #{!@league.nil?}, #{@league.id}"
+		if @league.id.nil?
+			p "ERROR! League not created!"
+			# redirect_to "/leagues/new"
+			render json: {response: "League not created: #{params}"}
+		else
+			updated_attributes = {:league_id => @league.id}
+			# @user.update_attributes(updated_attributes)
+			p "/leagues/#{@user.id}"
+			# create_league_players 
+			# redirect_to "/leagues/#{@user.id}"
+			render json: {response: "League created: #{updated_attributes}"}
+		end
+	end
+
+	def createOld
 		# @user = current_user
 		p "--- in leagues#create ---"
 		p "#{params}"
