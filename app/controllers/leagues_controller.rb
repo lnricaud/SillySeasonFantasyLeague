@@ -36,8 +36,8 @@ class LeaguesController < ApplicationController
 			user.update_attributes(updated_attributes)
 			p "user.league_id: #{user.league_id}"
 			create_league_players(league.id)
+			# should create a log for user created league
 
-			# redirect_to "/leagues/#{@user.id}"
 			# Create new token that includes the 
 			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69'
 			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
@@ -83,13 +83,29 @@ class LeaguesController < ApplicationController
 
   def join
   	p "join league params: #{params}"
-  	# p "params['league']['league_name'] #{params["league"]["league_name"]}"
-  	@user = current_user
-  	p "@user.id #{@user.id}"
-  	p "@league.id #{params["id"]}"
-  	updated_attributes = {:league_id => params["id"]}
-  	@user.update_attributes(updated_attributes)
-		redirect_to "/leagues/#{params["id"]}" 
+  	user = current_user
+  	p "user.email #{user.email}"
+  	league_params = params.permit(:league_id, :password)
+  	p "Trying to verify league =============================="
+  	p "league_params: #{league_params}"
+  	league = League.confirm(league_params)
+	  p "confirmed league?: #{league}"
+  	if league
+	  	p "league.id #{params["id"]}"
+	  	updated_attributes = {:league_id => league.id}
+	  	user.update_attributes(updated_attributes)
+	  	# should create a log for user joined league
+			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69'
+			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
+			p "payload: #{payload}"
+			token = JWT.encode payload, hmac_secret, 'HS256'
+
+			p "Success! render json: {id_token: token}"
+			render json: {id_token: token}
+		else # wrong password
+			head :not_found # TODO: make this more user friendly with message saying password was incorrect
+			# render json: {error: "Incorrect Password"}
+		end
   end
 
 	def show
