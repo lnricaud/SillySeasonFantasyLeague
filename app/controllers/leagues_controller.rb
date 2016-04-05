@@ -108,22 +108,15 @@ class LeaguesController < ApplicationController
 		end
   end
 
-	def show
-		@user = current_user
-		if @user.league_id.nil?
-			redirect_to "/leagues/new"
-		else
-			@league = @user.league
-			@users = @league.users
-			@names = @users.map {|name| (name.team_name unless name.team_name.nil?) }
-			p "names: #{@names}"
-			p "Team name: #{@user.team_name}"
-			if @user.team_name.nil?
-				redirect_to "/teams/index"
-			else
-				render :show
-			end
-		end
+	def myleague
+		user = current_user
+		league = user.league
+		p "league: #{league.inspect}"
+		users = league.users
+		# names = users.map {|name| (name.team_name unless name.team_name.nil?) }
+		# p "names: #{names}"
+		# p "Team name: #{user.team_name}"
+		render json: {league: myleague_clean(league), users: league_users_clean(users)} 
 	end
 
 	def all
@@ -146,8 +139,12 @@ class LeaguesController < ApplicationController
 
   def league_users_clean(users)
   	clean_users = []
-  	users.each {|user| clean_users.push({id: user.id, name: user.name, email: user.email, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, playervalue: player_value(user.players)})}
+  	users.each {|user| clean_users.push({id: user.id, name: user.name, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, playervalue: player_value(user.players)})}
   	return clean_users
+  end
+
+  def myleague_clean(league)
+  	return {id: league.id, league_name: league.league_name}
   end
 
   def player_value(players)

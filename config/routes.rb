@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   root "welcome#index"
 # leagues routes
   get "/leagues/new", to: "leagues#new", as: "new_league"
-  get "/leagues/:id", to: "leagues#show", as: "league"
+  get "/leagues/myleague", to: "leagues#myleague", as: "league"
   get "/leagues/:id/view", to: "leagues#view", as: "view"
   post "/leagues/join", to: "leagues#join", as: "join"
   get "/leagues", to: "leagues#all" # used by Angular 2 for getting all leagues
