@@ -45,21 +45,26 @@ module PlayersHelper
 		end
 	end
 
-	def leagueplayers
+	def leagueplayers(league)
+		parsedata unless defined? $data
 		$leagues = Hash.new unless defined? $leagues
-		players = Hash.new
-		league_players = @league.players
-		league_players.each do |player|
-			playerhash = {
-				id: player.playerdata_id,
-				user: player.user_id,
-				value: player.value,
-				owned: player.owned,
-				topbid: player.topbid
-			}
-			players[player.id] = playerhash
-			$leagues[player.league_id] = players
+		if !$leagues.key?('league.id')
+			players = Array.new
+			league_players = league.players
+			league_players.each do |player|
+				playerhash = {				
+					id: player.playerdata_id,
+					user: player.user_id,
+					value: player.value,
+					owned: player.owned,
+					topbid: player.topbid,
+					data: $data[player.id]
+				}
+				players.push(playerhash.merge($data[player.id]))
+				$leagues[league.id] = players
+			end
 		end
+		return $leagues[league.id]
 	end
 	
 	def getplayerpoints

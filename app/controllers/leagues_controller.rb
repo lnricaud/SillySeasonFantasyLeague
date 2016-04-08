@@ -112,11 +112,14 @@ class LeaguesController < ApplicationController
 		user = current_user
 		league = user.league
 		p "league: #{league.inspect}"
+		players = leagueplayers(league) # get player data
+		# p "players: #{players}"
+		logs = league.logs.last(20)
 		users = league.users
 		# names = users.map {|name| (name.team_name unless name.team_name.nil?) }
 		# p "names: #{names}"
 		# p "Team name: #{user.team_name}"
-		render json: {league: myleague_clean(league), users: league_users_clean(users)} 
+		render json: {league: myleague_clean(league), users: league_users_clean(users), myteam: my_team(players, user.id), logs: logs} 
 	end
 
 	def all
@@ -154,6 +157,11 @@ class LeaguesController < ApplicationController
   def league_owner(users, owner_id)
   	users.each {|user| return {name: user.name, email: user.email} if user.id == owner_id}
   	return {name: "Glenn", email: "glenn@hysen.se"}
+  end
+
+  def my_team(players, id)
+  	players.keep_if {|player| player[:user] == id}
+  	return players
   end
 
 end
