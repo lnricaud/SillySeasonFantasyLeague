@@ -58,9 +58,8 @@ module PlayersHelper
 					value: player.value,
 					owned: player.owned,
 					topbid: player.topbid,
-					data: $data[player.id]
 				}
-				players.push(playerhash.merge($data[player.id]))
+				players.push(playerhash.merge($data[player.playerdata_id]))
 				$leagues[league.id] = players
 			end
 		end
