@@ -55,6 +55,7 @@ module PlayersHelper
 				playerhash = {				
 					id: player.playerdata_id,
 					user: player.user_id,
+					user_name: player.user_id ? player.user.name : nil,
 					value: player.value,
 					owned: player.owned,
 					topbid: player.topbid,

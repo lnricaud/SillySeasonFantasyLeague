@@ -126,7 +126,7 @@ class TransfersController < ApplicationController
 		value = (player.value * 0.9).round
 		# if player was owned refund 90%
 		if player.owned
-			user.update_attributes(money: value)
+			user.update_attributes(money: user.money + value)
 		else # else subtract 10% of player value
 			loss = user.money - (player.value * 0.1).round
 			user.update_attributes(money: loss)
@@ -134,7 +134,7 @@ class TransfersController < ApplicationController
 		Log.create(action: "sell", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: value)
 		Log.where(action: "bid", game_week: current_gameweek, player_id: player.id, league_id: user.league_id).update_all(action: "old_bid")
 		player.update_attributes(user_id: nil, value: value ,owned: false, topbid: nil)
-		redirect_to "/transfers"
+		render json: {response: 'everything dandy'}
 	end
 
 	private
