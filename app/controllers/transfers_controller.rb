@@ -123,18 +123,22 @@ class TransfersController < ApplicationController
 		user = current_user
 		player = Player.where(id: params[:id], league_id: user.league_id).first
 		# update player to have user_id, topbid and owned false
-		value = (player.value * 0.9).round
-		# if player was owned refund 90%
-		if player.owned
-			user.update_attributes(money: user.money + value)
-		else # else subtract 10% of player value
-			loss = user.money - (player.value * 0.1).round
-			user.update_attributes(money: loss)
+		if player.user_id == user.id # change this back to ==
+			value = (player.value * 0.9).round
+			# if player was owned refund 90%
+			if player.owned
+				user.update_attributes(money: user.money + value)
+			else # else subtract 10% of player value
+				loss = user.money - (player.value * 0.1).round
+				user.update_attributes(money: loss)
+			end
+			Log.create(action: "sell", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: value)
+			Log.where(action: "bid", game_week: current_gameweek, player_id: player.id, league_id: user.league_id).update_all(action: "old_bid")
+			player.update_attributes(user_id: nil, value: value ,owned: false, topbid: nil)
+			render json: {response: 'player sold', money: current_user.money}
+		else # player has been bought by someone already or couldn't be found
+			render json: {err: 'Player was no longer yours', player: player}, :status => 422
 		end
-		Log.create(action: "sell", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: value)
-		Log.where(action: "bid", game_week: current_gameweek, player_id: player.id, league_id: user.league_id).update_all(action: "old_bid")
-		player.update_attributes(user_id: nil, value: value ,owned: false, topbid: nil)
-		render json: {response: 'everything dandy'}
 	end
 
 	private
