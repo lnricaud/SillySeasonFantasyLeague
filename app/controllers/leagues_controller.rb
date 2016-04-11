@@ -1,18 +1,6 @@
 class LeaguesController < ApplicationController
 	# before_action :authenticate
 
-	def new
-		p "IN LEAGUES NEW -----------"
-		@user = current_user
-		if @user.nil?
-			redirect_to "/sign_in" 
-		else
-			@league = League.new
-			@leagues = League.all
-			
-			render :new
-		end
-	end
 
 	def create
 		user = current_user
@@ -47,38 +35,6 @@ class LeaguesController < ApplicationController
 			p "Success! render json: {id_token: token}"
 			render json: {id_token: token} 
 		end
-	end
-
-	def createOld
-		# @user = current_user
-		p "--- in leagues#create ---"
-		p "#{params}"
-		p "@user"
-		p "create league params: #{params}"
-		p "params['league']['league_name'] #{params["league"]["league_name"]}"
-		p "current_user.id #{@user.id}"
-		league_params = {:league_name => params["league"]["league_name"], :user_id => @user.id}
-		p "CREATING A LEAGUE #{league_params}"
-		@league = League.create(league_params)
-		p "League created? #{!@league.nil?}, #{@league.id}"
-		if @league.id.nil?
-			p "ERROR! League not created!"
-			redirect_to "/leagues/new"
-		else
-			updated_attributes = {:league_id => @league.id}
-			@user.update_attributes(updated_attributes)
-			p "/leagues/#{@user.id}"
-			create_league_players 
-			redirect_to "/leagues/#{@user.id}"
-		end
-	end
-
-	def view # preview of league to join
-		p "in leagues#view, params: #{params}"
-		id = params[:id]
-		@league = League.find(id)
-		@users = @league.users
-		@admin = User.find(@league.user_id)
 	end
 
   def join
@@ -124,7 +80,7 @@ class LeaguesController < ApplicationController
 		# names = users.map {|name| (name.team_name unless name.team_name.nil?) }
 		# p "names: #{names}"
 		# p "Team name: #{user.team_name}"
-		render json: {league: myleague_clean(league), users: league_users_clean(users), myteam: my_team(players, user.id), logs: expanded_logs.reverse} 
+		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, logs: expanded_logs.reverse} 
 	end
 
 	def all
@@ -171,3 +127,47 @@ class LeaguesController < ApplicationController
 
 end
 
+	# def new
+	# 	p "IN LEAGUES NEW -----------"
+	# 	@user = current_user
+	# 	if @user.nil?
+	# 		redirect_to "/sign_in" 
+	# 	else
+	# 		@league = League.new
+	# 		@leagues = League.all
+			
+	# 		render :new
+	# 	end
+	# end
+
+	# def createOld
+	# 	# @user = current_user
+	# 	p "--- in leagues#create ---"
+	# 	p "#{params}"
+	# 	p "@user"
+	# 	p "create league params: #{params}"
+	# 	p "params['league']['league_name'] #{params["league"]["league_name"]}"
+	# 	p "current_user.id #{@user.id}"
+	# 	league_params = {:league_name => params["league"]["league_name"], :user_id => @user.id}
+	# 	p "CREATING A LEAGUE #{league_params}"
+	# 	@league = League.create(league_params)
+	# 	p "League created? #{!@league.nil?}, #{@league.id}"
+	# 	if @league.id.nil?
+	# 		p "ERROR! League not created!"
+	# 		redirect_to "/leagues/new"
+	# 	else
+	# 		updated_attributes = {:league_id => @league.id}
+	# 		@user.update_attributes(updated_attributes)
+	# 		p "/leagues/#{@user.id}"
+	# 		create_league_players 
+	# 		redirect_to "/leagues/#{@user.id}"
+	# 	end
+	# end
+
+	# def view # preview of league to join
+	# 	p "in leagues#view, params: #{params}"
+	# 	id = params[:id]
+	# 	@league = League.find(id)
+	# 	@users = @league.users
+	# 	@admin = User.find(@league.user_id)
+	# end
