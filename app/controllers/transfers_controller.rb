@@ -43,25 +43,39 @@ class TransfersController < ApplicationController
 	end
 
 	def newgameweek # changes to next gameweek and transfers becomes active
-		if transfers_active?
-			set_owned_true
-			subtract_salaries
-		end
-		calc_points
-		
-		nextGW = current_gameweek + 1
-		log = Log.create(action: 'newgameweek', game_week: nextGW)
-		p log
-		redirect_to "/transfers" 
+		# check if user is admin
+		user = current_user
+		if user.admin
+			if transfers_active?
+				set_owned_true
+				subtract_salaries
+			end
+			p "<=><=><=><=><=><=> in newgameweek before calc_points"
+			calc_points
+			p "<=><=><=><=><=><=> in newgameweek after calc_points"
+			nextGW = current_gameweek + 1
+			log = Log.create(action: 'newgameweek', game_week: nextGW)
+			p log
+			render json: {response: 'New Game Week', gameweek: nextGW}
+		else
+			render json: {err: 'Not Autherized to Start New GameWeek'}, status: 401
+		end 
 	end
 
 	def stoptransfers
-		p "in stop transfers"
-		set_owned_true
-		subtract_salaries
-		log = Log.create(action: "stoptransfers", game_week: current_gameweek)
-		p "log created: #{log}"
-		redirect_to "/transfers"
+		user = current_user
+		if user.admin && transfers_active?
+			p "in stop transfers"
+			set_owned_true
+			subtract_salaries
+			log = Log.create(action: "stoptransfers", game_week: current_gameweek)
+			p "log created: #{log}"
+			render json: {response: 'Transfers Stopped'}
+		elsif transfers_active?
+			render json: {err: 'Not Autherized to Stop Transfers'}, status: 401
+		else
+			render json: {err: 'Transfers already Stopped'}, status: 422
+		end
 	end
 
 	def bid

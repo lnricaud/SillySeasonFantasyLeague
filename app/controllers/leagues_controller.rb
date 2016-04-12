@@ -81,7 +81,7 @@ class LeaguesController < ApplicationController
 		# names = users.map {|name| (name.team_name unless name.team_name.nil?) }
 		# p "names: #{names}"
 		# p "Team name: #{user.team_name}"
-		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, logs: expanded_logs.reverse, money: user.money} 
+		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, logs: expanded_logs.reverse, money: user.money, gameweek: current_gameweek, transfersactive: transfers_active?} 
 	end
 
 	def all
