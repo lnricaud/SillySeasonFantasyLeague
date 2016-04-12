@@ -74,13 +74,14 @@ class LeaguesController < ApplicationController
 		users_names = {}
 		users.each {|u| users_names[u.id] = u.name}
 		# p "league users: #{users.inspect}"
-		logs = league.logs.where(action: 'bid').last(20)
+		logs = Log.where(:action => ['transfer', 'sell', 'newPlayer'], :league_id => [league.id, nil]).last(20)
+		# p "<><><><><><><>logs: #{logs.inspect}"
 		expanded_logs = logs.map {|log| {action: log.action, user: users_names[log.user_id], time: log.created_at, gw: log.game_week, value: log.value} }
 		p expanded_logs
 		# names = users.map {|name| (name.team_name unless name.team_name.nil?) }
 		# p "names: #{names}"
 		# p "Team name: #{user.team_name}"
-		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, logs: expanded_logs.reverse} 
+		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, logs: expanded_logs.reverse, money: user.money} 
 	end
 
 	def all

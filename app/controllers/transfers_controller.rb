@@ -65,57 +65,60 @@ class TransfersController < ApplicationController
 	end
 
 	def bid
-		p "in transfers#bid, params: #{params}"
 		bid = params[:bid].to_i
-		p "bid value: #{params[:bid]}"
 		user = current_user
-		player = Player.where(id: params[:id], league_id: user.league_id).first # .first is needed or the relations won't work
+		sentPlayer = params[:player]
+		player = Player.where(id: sentPlayer[:id], league_id: user.league_id).first # .first is needed or the relations won't work
 		owner = player.user
-		
-#\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-		highestBid = Log.where(player_id: player.id, league_id: user.league_id, action: "bid").order("value DESC").first
-		Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: bid)
-		if user == owner
-			highestBid.update_attributes({value: bid})
-			updated_attributes = {topbid: bid}
+		unless player[:value] == sentPlayer[:value] && player[:user_id] == sentPlayer[:user] && player[:owned] == sentPlayer[:owned]
+			# Player has changed on the server
+			render json: {err: "Player has changed on the server"}, status: 422
 		else
-			if player.user.nil? # player was a free agent
-				updated_attributes = {user_id: user.id, topbid: bid}
-				fee = user.money - player.value
-				user.update_attributes(money: fee) # subtracts the value of the player from user's money
-			else # bidding on a player owned by another user
-				if bid > highestBid.value
-					# bid buys player
-					if bid < highestBid.value + 100000
-						value = bid
-					else
-						value = highestBid.value + 100000
-					end
-					updated_attributes = {value: value, user_id: user.id, owned: false, topbid: bid}
-					fee = user.money - value
-					user.update_attributes(money: fee) # user pays for the player
-					if player.owned # owner makes a profit
-						profit = owner.money + value
-						owner.update_attributes(money: profit)
-					else # owner get his money back, no profit
-						refund = owner.money + player.value
-						owner.update_attributes(money: refund)
-					end
-				else
-					# bid increases value of player for current owner
-					value = bid
-					updated_attributes = {value: value}
-					difference = owner.money - (value - player.value)
-					p "difference: #{difference}, owner money: #{owner.money}, bid: #{value}, player value: #{player.value}"
-					owner.update_attributes(money: difference) # player value increased, owner compensating for that with the difference
-				end
-				player.update_attributes(updated_attributes)		
-			end
-			$leagues[user.league_id][player.id][:value] = value
-		end
-		player.update_attributes(updated_attributes)
 #\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-		redirect_to "/transfers"
+			highestBid = Log.where(player_id: player.id, league_id: user.league_id, action: "bid").order("value DESC").first
+			Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: bid)
+			if user == owner # updating topbid of owned player
+				highestBid.update_attributes({value: bid})
+				updated_attributes = {topbid: bid}
+			else
+				if player.user.nil? # player was a free agent
+					updated_attributes = {user_id: user.id, topbid: bid}
+					fee = user.money - player.value
+					user.update_attributes(money: fee) # subtracts the value of the player from user's money
+				else # bidding on a player owned by another user
+					if bid > highestBid.value
+						# bid buys player
+						if bid < highestBid.value + 100000
+							value = bid
+						else
+							value = highestBid.value + 100000
+						end
+						updated_attributes = {value: value, user_id: user.id, owned: false, topbid: bid}
+						fee = user.money - value
+						user.update_attributes(money: fee) # user pays for the player
+						if player.owned # owner makes a profit
+							profit = owner.money + value
+							owner.update_attributes(money: profit)
+						else # owner get his money back, no profit
+							refund = owner.money + player.value
+							owner.update_attributes(money: refund)
+						end
+					else
+						# bid increases value of player for current owner
+						value = bid
+						updated_attributes = {value: value}
+						difference = owner.money - (value - player.value)
+						p "difference: #{difference}, owner money: #{owner.money}, bid: #{value}, player value: #{player.value}"
+						owner.update_attributes(money: difference) # player value increased, owner compensating for that with the difference
+					end
+					player.update_attributes(updated_attributes)		
+				end
+				$leagues[user.league_id][player.id][:value] = value
+			end
+			player.update_attributes(updated_attributes)
+			render json: {response: "player updated"}
+#\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+		end
 	end
 
 	def sell

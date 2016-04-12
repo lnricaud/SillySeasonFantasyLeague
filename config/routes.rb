@@ -36,6 +36,6 @@ Rails.application.routes.draw do
   get "/transfers", to: "transfers#index", as: "transfers"
   get "/transfers/stoptransfers", to: "transfers#stoptransfers", as: "stop"
   get "/transfers/newgameweek", to: "transfers#newgameweek", as: "newgameweek"
-  get "/transfers/bid/:id", to: "transfers#bid", as: "bid"
+  post "/transfers/bid", to: "transfers#bid", as: "bid"
   get  "/transfers/sell/:id", to: "transfers#sell", as: "sell"
 end
