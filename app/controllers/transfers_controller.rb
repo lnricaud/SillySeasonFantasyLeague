@@ -82,8 +82,10 @@ class TransfersController < ApplicationController
 		bid = params[:bid].to_i
 		user = current_user
 		sentPlayer = params[:player]
-		player = Player.where(id: sentPlayer[:id], league_id: user.league_id).first # .first is needed or the relations won't work
+		player = Player.find sentPlayer[:id]
+		p "<=><=><=><=><=><=> in bid, player: #{player.inspect}"
 		owner = player.user
+		p "<=><=><=><=><=><=> in bid, owner: #{owner}"
 		unless player[:value] == sentPlayer[:value] && player[:user_id] == sentPlayer[:user] && player[:owned] == sentPlayer[:owned]
 			# Player has changed on the server
 			render json: {err: "Player has changed on the server"}, status: 422
@@ -127,7 +129,7 @@ class TransfersController < ApplicationController
 					end
 					player.update_attributes(updated_attributes)		
 				end
-				$leagues[user.league_id][player.id][:value] = value
+				# $leagues[user.league_id][player.id][:value] = value
 			end
 			player.update_attributes(updated_attributes)
 			render json: {response: "player updated"}

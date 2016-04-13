@@ -47,13 +47,14 @@ module PlayersHelper
 
 	def leagueplayers(league)
 		parsedata unless defined? $data
-		$leagues = Hash.new unless defined? $leagues
-		if !$leagues.key?('league.id')
+		# $leagues = Hash.new unless defined? $leagues
+		# if !$leagues.key?('league.id')
 			players = Array.new
 			league_players = league.players
 			league_players.each do |player|
 				playerhash = {				
-					id: player.playerdata_id,
+					id: player.id,
+					playerdata_id: player.playerdata_id,
 					user: player.user_id,
 					user_name: player.user_id ? player.user.name : nil,
 					value: player.value,
@@ -61,10 +62,11 @@ module PlayersHelper
 					topbid: player.topbid,
 				}
 				players.push(playerhash.merge($data[player.playerdata_id]))
-				$leagues[league.id] = players
+			# $leagues[league.id] = players
 			end
-		end
-		return $leagues[league.id]
+		# end
+		# return $leagues[league.id]
+		return players
 	end
 	
 	def getplayerpoints
