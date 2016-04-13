@@ -4,7 +4,6 @@ Rails.application.routes.draw do
   get "/api/random-quote", to: "sessions#random_quote"
   get "/api/protected/random-quote", to: "transfers#protected"
   post "/users/", to: "users#create"
-  post "/sessions/create", to: "sessions#create"
 
   root "welcome#index"
 # leagues routes
@@ -25,9 +24,8 @@ Rails.application.routes.draw do
   # post "/users/", to: "users#create"
 
 # sessions routes
-  # get "/sign_in", to: "sessions#new"  
-  # post "/sessions", to: "sessions#create"
-  # delete "/sessions", to: "sessions#destroy", as: "logout"
+  post "/sessions/create", to: "sessions#create"
+
 # players routes
   get "/players/refresh", to: "players#refresh", as: "refresh"
   get "/players/players", to: "players#players", as: "players"
