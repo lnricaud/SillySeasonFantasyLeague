@@ -1,11 +1,11 @@
 class PlayersController < ApplicationController
 	before_action :authenticate
-	require_relative 
 	def refresh
 		user = current_user
 		if user.admin
 			require 'open-uri'
 			require 'json'
+			require 'player' # custom class for players
 			i = 1
 			loop do
 				begin
@@ -15,6 +15,8 @@ class PlayersController < ApplicationController
 				  break  
 				end  
 				# p player_data["id"]
+				
+
 				db_data = Playerdata.find_by_id(i)
 				if db_data.nil?
 					p "Creating new Playerdata"
@@ -23,6 +25,12 @@ class PlayersController < ApplicationController
 					p "Adding new Player to all Leagues"
 					Log.create(action: "newPlayer", game_week: current_gameweek, player_id: i, message: "Player added to league")
 					leagueplayers
+					
+					leagues = League.all
+					leagues.each do |league|
+						league.id
+
+					end
 					1.upto(League.count) do |l|
 						# refactor to add player json to League.players instead
 
