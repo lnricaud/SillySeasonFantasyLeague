@@ -28,8 +28,8 @@ Rails.application.routes.draw do
 
 # players routes
   get "/players/refresh", to: "players#refresh", as: "refresh"
-  get "/players/players", to: "players#players", as: "players"
-  get "/players/:id", to: "players#player", as: "player"
+  # get "/players/players", to: "players#players", as: "players"
+  # get "/players/:id", to: "players#player", as: "player"
 # transfer routes
   get "/transfers", to: "transfers#index", as: "transfers"
   get "/transfers/stoptransfers", to: "transfers#stoptransfers", as: "stop"

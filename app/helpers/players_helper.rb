@@ -51,6 +51,8 @@ module PlayersHelper
 		# if !$leagues.key?('league.id')
 			players = Array.new
 			league_players = league.players
+			p "<>>>>>>><<<<<<<>>>>>><<<<<><>>>>>><<>>"
+			p league_players.first
 			league_players.each do |player|
 				playerhash = {				
 					id: player.id,
