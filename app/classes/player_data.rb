@@ -1,5 +1,5 @@
 class Playerdata
-  attr :id, :web_name, :first_name, :last_name, :team_name, :position, :team_id, :current_fixture, :next_fixture, :news, :fixtures_played, :fixtures_last3, :fixtures_next, :fixtures_next3, :gw_points, :gw_plays, :gw_plays_next, :gw_details, :total_points, :minutes, :points_per_game, :goals_scored, :assists, :clean_sheets, :goals_conceded, :own_goals, :penalties_saved, :penalties_missed, :yellow_cards, :red_cards, :saves, :bonus, :season_history
+  attr_reader :id, :web_name, :first_name, :last_name, :team_name, :position, :team_id, :current_fixture, :next_fixture, :news, :fixtures_played, :fixtures_last3, :fixtures_next, :fixtures_next3, :gw_points, :gw_plays, :gw_plays_next, :gw_details, :total_points, :minutes, :points_per_game, :goals_scored, :assists, :clean_sheets, :goals_conceded, :own_goals, :penalties_saved, :penalties_missed, :yellow_cards, :red_cards, :saves, :bonus, :season_history
 
   def initialize(data)
     @id = data["id"]

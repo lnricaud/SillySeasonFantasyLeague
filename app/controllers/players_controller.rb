@@ -1,52 +1,63 @@
 class PlayersController < ApplicationController
 	before_action :authenticate
+	
 	def refresh
+		require 'json'
+		require 'open-uri'
+		require 'player_data'
+		require 'player'
+
 		user = current_user
 		if user.admin
-			require 'open-uri'
-			require 'json'
-			require 'player' # custom class for players
+			
+			gw = current_gameweek + 1 # new players available next game week
+			playersadded = false # do not update league.players unless new players has been added
+			league_players = Hash.new
+		 #league_players[league_id] = [Player, Player, ...] <- League.players
+			leagues = League.all
+			leagues.each { |league| league_players[league.id] = JSON.parse league.players } unless leagues.nil?
+			db_player_data = Playerdata.last
+			if db_player_data.nil?
+				newplayer = false # don't create new player log for start of season
+				$Playerdata = Hash.new
+			else
+				newplayer = true
+				$Playerdata = JSON.parse db_player_data.data
+			end
+
 			i = 1
 			loop do
 				begin
-				  player_data = open("http://fantasy.premierleague.com/web/api/elements/#{i}/").read  
+				  player_data = JSON.parse open("http://fantasy.premierleague.com/web/api/elements/#{i}/").read  
 				rescue OpenURI::HTTPError   
 				  p "Found last element, breaking out of loop"
 				  break  
 				end  
-				# p player_data["id"]
-				
 
-				db_data = Playerdata.find_by_id(i)
-				if db_data.nil?
-					p "Creating new Playerdata"
-					# update Playerdata to hold all columns instead of json
-					player = Playerdata.create(data: player_data)
-					p "Adding new Player to all Leagues"
-					Log.create(action: "newPlayer", game_week: current_gameweek, player_id: i, message: "Player added to league")
-					leagueplayers
-					
-					leagues = League.all
-					leagues.each do |league|
-						league.id
-
+				if $playerdata[i].nil? # Add player class to each league
+					unless league_players.empty?
+						playersadded = true # update league.players
+						league_players.map {|league_id, players| players.push Player(i)}
 					end
-					1.upto(League.count) do |l|
-						# refactor to add player json to League.players instead
 
-
-						pl = Player.create({league_id: l, playerdata_id: i, value: 4000000})
-						p "Created player: #{pl[:id]}"
+					if newplayer # only create log if not start of season
+					Log.create(action: "newPlayer", game_week: gw, player_id: i, message: "#{player_data["web_name"]} added to #{player_data["team_name"]}")
 					end
-				else
-					p "Uppdating existing playerdata.data"
-					updated_attributes = {:data => player_data}
-					db_data.update_attributes(updated_attributes)
 				end
+				
+				# add player to $playerdata hash
+				$playerdata[i] = playerdata.new(player_data)
+
 				i += 1
 			end
+			p "%%%%%%%%%%%%%%%%%%%%% $playerdata: #{$playerdata}"
+			# Add playerdata to playerdata.data
+			Playerdata.create(data: $playerdata.to_json)
+			if playersadded # update players in each league
+				leagues.each {|league| league.update_attributes(players: league_players[league.id].to_json)}
+			end
 			# byebug
-			parsedata
+			# parsedata
 			render json: {response: 'Player Data Refreshed'}
 		else
 			render json: {err: 'Not Autherized to Refresh Player Data'}, status: 401

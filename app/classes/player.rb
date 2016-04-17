@@ -1,10 +1,9 @@
 class Player
-  attr_reader :league_id, :playerdata_id
+  attr_reader :playerdata_id
   attr_accessor :value, :topbid, :gw_value, :owned
 
-  def initialize(playerdata_id, league_id)
+  def initialize(playerdata_id)
     startvalue = 4000000
-    @league_id = league_id
     @playerdata_id = playerdata_id
     @value = startvalue
     @topbid = startvalue
@@ -22,6 +21,6 @@ class Player
   end
   def data
     # get data for for player, need to refactor the data element first
-    
+
   end
 end
