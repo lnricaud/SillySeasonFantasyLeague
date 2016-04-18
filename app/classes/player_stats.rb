@@ -1,4 +1,4 @@
-class Playerdata
+class Playerstats
   attr_reader :id, :web_name, :first_name, :last_name, :team_name, :position, :team_id, :current_fixture, :next_fixture, :news, :fixtures_played, :fixtures_last3, :fixtures_next, :fixtures_next3, :gw_points, :gw_plays, :gw_plays_next, :gw_details, :total_points, :minutes, :points_per_game, :goals_scored, :assists, :clean_sheets, :goals_conceded, :own_goals, :penalties_saved, :penalties_missed, :yellow_cards, :red_cards, :saves, :bonus, :season_history
 
   def initialize(data)
@@ -19,7 +19,7 @@ class Playerdata
     @gw_points = data["event_total"]
     @gw_plays = data["chance_of_playing_this_round"]
     @gw_plays_next = data["chance_of_playing_next_round"]
-    @gw_details = data["event_explain"] # dynamic array
+    @gw_details = data["event_explain"]
     @total_points = data["total_points"]
     @minutes = data["minutes"]
     @points_per_game = data["points_per_game"]
@@ -34,6 +34,7 @@ class Playerdata
     @red_cards = data["red_cards"]
     @saves = data["saves"]
     @bonus = data["bonus"]
-    @season_history = data["season_history"] # array
+    @season_history = data["season_history"]
   end
 end
+

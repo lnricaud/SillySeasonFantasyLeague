@@ -1,6 +1,6 @@
 class Player
   attr_reader :playerdata_id
-  attr_accessor :value, :topbid, :gw_value, :owned
+  attr_accessor :value, :topbid, :gw_value, :user_id, :owned
 
   def initialize(playerdata_id)
     startvalue = 4000000
@@ -8,7 +8,8 @@ class Player
     @value = startvalue
     @topbid = startvalue
     @gw_value = startvalue
-    @owned = false
+    @user_id = nil
+    @owned = false # this indicates if the player was bought before transfer stop
   end
   def salary
     (@value*0.9).round
