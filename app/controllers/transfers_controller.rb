@@ -49,7 +49,6 @@ class TransfersController < ApplicationController
 			if transfers_active?
 				set_owned_true
 				subtract_salaries
-				Log.where(action: 'newPlayer').destroy_all
 			end
 			p "<=><=><=><=><=><=> in newgameweek before calc_points"
 			calc_points
@@ -71,7 +70,6 @@ class TransfersController < ApplicationController
 			subtract_salaries
 			log = Log.create(action: "stoptransfers", game_week: current_gameweek)
 			p "log created: #{log}"
-			Log.where(action: 'newPlayer').destroy_all
 			render json: {response: 'Transfers Stopped'}
 		elsif transfers_active?
 			render json: {err: 'Not Autherized to Stop Transfers'}, status: 401

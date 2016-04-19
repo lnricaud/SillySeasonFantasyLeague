@@ -1,8 +1,9 @@
 class LeaguesController < ApplicationController
 	# before_action :authenticate
 
-
 	def create
+		require 'player'
+		require 'yaml'
 		user = current_user
 		p "--- in leagues#create ---"
 		p "#{params}"
@@ -12,27 +13,29 @@ class LeaguesController < ApplicationController
 		# league_params = {:league_name => params["league"]["league_name"], :user_id => user.id, }
 		league_params = params.permit(:league_name, :password)
 		league_params[:user_id] = user.id
-		p "CREATING A LEAGUE #{league_params}"
+		# adding players
+		this_leagues_players = Hash.new
+		$playerdata.each {|id, player| this_leagues_players[id] = Player.new(id)}
+		league_params[:players] = YAML::dump this_leagues_players
+		
+		p "CREATING A LEAGUE: #{league_params}"
 		league = League.create(league_params)
 		p "League created? #{!league.nil?}, id: #{league.id}"
 		if league.id.nil?
 			p "ERROR! League not created!"
 			# redirect_to "/leagues/new"
 			render json: {error: "League not created: #{params}"}, status: :unprocessable_entity
-		else
+		else # League Successfully created
+			$leagueplayers[league.id] = this_leagues_players # add league players to global hash
 			updated_attributes = {:league_id => league.id}
 			user.update_attributes(updated_attributes)
-			p "user.league_id: #{user.league_id}"
-			create_league_players(league.id)
-			# should create a log for user created league
-
+			
 			# Create new token that includes the 
-			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69'
+			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69' # TODO: move this to env
 			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
 			p "payload: #{payload}"
 			token = JWT.encode payload, hmac_secret, 'HS256'
 
-			p "Success! render json: {id_token: token}"
 			render json: {id_token: token} 
 		end
 	end
@@ -50,8 +53,12 @@ class LeaguesController < ApplicationController
 	  	p "league.id #{params["id"]}"
 	  	updated_attributes = {:league_id => league.id}
 	  	user.update_attributes(updated_attributes)
-	  	# should create a log for user joined league
-			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69'
+	  	if $leagueplayers[league.id].nil?
+	  		loadleagueplayers(league) # adds this league's players to the global scope
+	  	end
+	  	Log.create(action: "joined", gameweek: current_gameweek, user_id: user.id, league_id: league.id, message: "#{user.name} joined the #{league.league_name} with team #{user.team_name}")
+
+			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69' # TODO: move this to env
 			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
 			p "payload: #{payload}"
 			token = JWT.encode payload, hmac_secret, 'HS256'
@@ -59,8 +66,7 @@ class LeaguesController < ApplicationController
 			p "Success! render json: {id_token: token}"
 			render json: {id_token: token}
 		else # wrong password
-			head :not_found # TODO: make this more user friendly with message saying password was incorrect
-			# render json: {error: "Incorrect Password"}
+			render json: {err: "Incorrect Password", cause: 'password'}, status: 401
 		end
   end
 
@@ -68,20 +74,13 @@ class LeaguesController < ApplicationController
 		user = current_user
 		league = user.league
 		p "league: #{league.inspect}"
-		players = leagueplayers(league) # get player data
-		# p "players: #{players}"
+		if $leagueplayers[league.id].nil?
+			loadleagueplayers(league) # adds this league's players to the global scope
+		end
+		players = $leagueplayers[league.id] # {id: Player, id: Player, ...}
 		users = league.users
-		users_names = {}
-		users.each {|u| users_names[u.id] = u.name}
-		# p "league users: #{users.inspect}"
-		logs = Log.where(:action => ['transfer', 'sell', 'newPlayer'], :league_id => [league.id, nil]).last(20)
-		# p "<><><><><><><>logs: #{logs.inspect}"
-		expanded_logs = logs.map {|log| {action: log.action, user: users_names[log.user_id], time: log.created_at, gw: log.game_week, value: log.value} }
-		p expanded_logs
-		# names = users.map {|name| (name.team_name unless name.team_name.nil?) }
-		# p "names: #{names}"
-		# p "Team name: #{user.team_name}"
-		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, logs: expanded_logs.reverse, money: user.money, gameweek: current_gameweek, transfersactive: transfers_active?} 
+		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined'], :league_id => [league.id, nil]).last(20)
+		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, playerdata: $playerdata, logs: logs.reverse, money: user.money, gameweek: current_gameweek, transfersactive: transfers_active?} 
 	end
 
 	def all
@@ -96,15 +95,11 @@ class LeaguesController < ApplicationController
 	end
 
   private
-  def create_league_players(id)
-  	1.upto(Playerdata.count) do |i|
-  		Player.create({league_id: id, playerdata_id: i, value: 4000000})
-  	end
-  end
 
   def league_users_clean(users)
+  	require 'json'
   	clean_users = []
-  	users.each {|user| clean_users.push({id: user.id, name: user.name, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, playervalue: player_value(user.players)})}
+  	users.each {|user| clean_users.push({id: user.id, name: user.name, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, playervalue: 0})} # TODO: change so player_value is calculateds
   	return clean_users
   end
 
@@ -128,47 +123,3 @@ class LeaguesController < ApplicationController
 
 end
 
-	# def new
-	# 	p "IN LEAGUES NEW -----------"
-	# 	@user = current_user
-	# 	if @user.nil?
-	# 		redirect_to "/sign_in" 
-	# 	else
-	# 		@league = League.new
-	# 		@leagues = League.all
-			
-	# 		render :new
-	# 	end
-	# end
-
-	# def createOld
-	# 	# @user = current_user
-	# 	p "--- in leagues#create ---"
-	# 	p "#{params}"
-	# 	p "@user"
-	# 	p "create league params: #{params}"
-	# 	p "params['league']['league_name'] #{params["league"]["league_name"]}"
-	# 	p "current_user.id #{@user.id}"
-	# 	league_params = {:league_name => params["league"]["league_name"], :user_id => @user.id}
-	# 	p "CREATING A LEAGUE #{league_params}"
-	# 	@league = League.create(league_params)
-	# 	p "League created? #{!@league.nil?}, #{@league.id}"
-	# 	if @league.id.nil?
-	# 		p "ERROR! League not created!"
-	# 		redirect_to "/leagues/new"
-	# 	else
-	# 		updated_attributes = {:league_id => @league.id}
-	# 		@user.update_attributes(updated_attributes)
-	# 		p "/leagues/#{@user.id}"
-	# 		create_league_players 
-	# 		redirect_to "/leagues/#{@user.id}"
-	# 	end
-	# end
-
-	# def view # preview of league to join
-	# 	p "in leagues#view, params: #{params}"
-	# 	id = params[:id]
-	# 	@league = League.find(id)
-	# 	@users = @league.users
-	# 	@admin = User.find(@league.user_id)
-	# end

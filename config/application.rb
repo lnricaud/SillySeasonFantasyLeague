@@ -21,7 +21,7 @@ module SillySeasonFantasyLeague
   class Application < Rails::Application
     # Custom object classes in /app/classes folder
     config.autoload_paths << "#{Rails.root}/app/classes"
-    
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -43,13 +43,28 @@ module SillySeasonFantasyLeague
     #     }
     config.middleware.insert_before 0, "Rack::Cors" do
       allow do
-        origins '*'
-        resource '*', :headers => :any, :methods => [:get, :post, :options]
+      origins '*'
+      resource '*', :headers => :any, :methods => [:get, :post, :options]
       end
     end
-  end
 
+    ## initialize global variables
+    config.after_initialize do
+      p "Init $playerdata"
+      require 'yaml'
+      require 'player'
+      $leagueplayers = Hash.new # $leagueplayers[league_id] = {id: Player, id: Player, ...} Users login their players are added from the db to this global variable to reduce calls the the db.
+      $playerdata = Hash.new
+      if Playerdata.table_exists?
+        db_player_data = Playerdata.last
+        unless db_player_data.nil?
+          $playerdata = YAML::load db_player_data.data
+        end
+      end
+    end
+
+  end
 end
 
 
-        # 'Access-Control-Allow-Origin' => 'http://localhost:3000',
+# 'Access-Control-Allow-Origin' => 'http://localhost:3000',

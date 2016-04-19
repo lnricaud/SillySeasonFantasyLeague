@@ -3,7 +3,6 @@ class League < ActiveRecord::Base
 	validates :league_name, presence: true, uniqueness:true
 
 	has_many :users
-	has_many :players
 	has_many :logs
 
 	def self.confirm(params)

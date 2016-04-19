@@ -3,26 +3,28 @@ class PlayersController < ApplicationController
 	
 	def refresh
 		require 'json'
+		require 'yaml' # preserves class properties and methods
 		require 'open-uri'
-		require 'player_data'
 		require 'player'
 
 		user = current_user
 		if user.admin
 			
-			gw = current_gameweek + 1 # new players available next game week
+			gw = current_gameweek
 			playersadded = false # do not update league.players unless new players has been added
-			league_players = Hash.new
-		 #league_players[league_id] = [Player, Player, ...] <- League.players
+			$leagueplayers = Hash.new # resets the global variable so that will contain updated data
+			league_players = Hash.new # league_players[league_id] = {id: Player, id: Player, ...} <- League.players
 			leagues = League.all
-			leagues.each { |league| league_players[league.id] = JSON.parse league.players } unless leagues.nil?
+			unless leagues.nil?
+				leagues.each { |league| league_players[league.id] = YAML::load league.players }
+			end
 			db_player_data = Playerdata.last
 			if db_player_data.nil?
 				newplayer = false # don't create new player log for start of season
-				$Playerdata = Hash.new
+				$playerdata = Hash.new
 			else
 				newplayer = true
-				$Playerdata = JSON.parse db_player_data.data
+				$playerdata = YAML::load db_player_data.data
 			end
 
 			i = 1
@@ -33,52 +35,31 @@ class PlayersController < ApplicationController
 				  p "Found last element, breaking out of loop"
 				  break  
 				end  
-
 				if $playerdata[i].nil? # Add player class to each league
 					unless league_players.empty?
 						playersadded = true # update league.players
-						league_players.map {|league_id, players| players.push Player(i)}
+						league_players.map {|league_id, players| players[i] = Player.new(i)}
 					end
-
 					if newplayer # only create log if not start of season
-					Log.create(action: "newPlayer", game_week: gw, player_id: i, message: "#{player_data["web_name"]} added to #{player_data["team_name"]}")
+					Log.create(action: "newplayer", game_week: gw, player_id: i, message: "#{player_data["web_name"]} added to #{player_data["team_name"]}")
 					end
 				end
-				
 				# add player to $playerdata hash
-				$playerdata[i] = playerdata.new(player_data)
-
+				$playerdata[i] = Playerstats.new(player_data)
+				p "Got api data: #{i}"
 				i += 1
 			end
-			p "%%%%%%%%%%%%%%%%%%%%% $playerdata: #{$playerdata}"
+			
 			# Add playerdata to playerdata.data
-			Playerdata.create(data: $playerdata.to_json)
-			if playersadded # update players in each league
-				leagues.each {|league| league.update_attributes(players: league_players[league.id].to_json)}
+			serialized_playerdata = YAML::dump($playerdata)
+			Playerdata.create(data: serialized_playerdata)
+			if playersadded && !leagues.nil? # update players in each league
+				leagues.each {|league| league.update_attributes(players: YAML::dump(league_players[league.id]))}
 			end
-			# byebug
-			# parsedata
 			render json: {response: 'Player Data Refreshed'}
 		else
 			render json: {err: 'Not Autherized to Refresh Player Data'}, status: 401
 		end
 	end
-
-	# def players
-	# 	user = current_user
-	# 	players = Player.where(league_id: user.league_id)
-	#  	player_data = parsedata unless defined? $data # update view later to accept @data instead of @player_data, also change so the it uses keys instead of json
-	# 	# byebug
-	# 	render :players
-	# end
-	# def player # show player data
-	# 	p "Showing player, params: #{params}"
-	# 	@player = Player.find_by_id(params[:id])
-	# 	p @player
-	# 	@player_data = JSON.parse(@player.playerdata.data)
-	# 	p @player_data
-	# 	render :player
-	# end
-
 
 end

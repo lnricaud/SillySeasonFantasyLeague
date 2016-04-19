@@ -150,7 +150,7 @@ In a browser go to "http://127.0.0.1:1080" for virtual inboxer
 ## Logs
 Logs keep track of events. Logs are of the following kind:
 
-* newPlayer - created when new player is added to API data
+* newplayer - created when new player is added to API data
 * stoptransfers - created before the first game starts, stops transfers until newgameweek has been created
 * newgameweek - created after games have been played, calculates the points for each user and activates transfers
 * gwpoints - created for each user after each game week. Shows the total points for that game week from user's players
