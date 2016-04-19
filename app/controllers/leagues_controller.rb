@@ -77,7 +77,9 @@ class LeaguesController < ApplicationController
 		if $leagueplayers[league.id].nil?
 			loadleagueplayers(league) # adds this league's players to the global scope
 		end
-		players = $leagueplayers[league.id] # {id: Player, id: Player, ...}
+		players = $leagueplayers[league.id].values # {id: Player, id: Player, ...}
+		p "<<<<<<>>>>>>> players: #{players}"
+		 
 		users = league.users
 		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined'], :league_id => [league.id, nil]).last(20)
 		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, playerdata: $playerdata, logs: logs.reverse, money: user.money, gameweek: current_gameweek, transfersactive: transfers_active?} 
@@ -97,10 +99,7 @@ class LeaguesController < ApplicationController
   private
 
   def league_users_clean(users)
-  	require 'json'
-  	clean_users = []
-  	users.each {|user| clean_users.push({id: user.id, name: user.name, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, playervalue: 0})} # TODO: change so player_value is calculateds
-  	return clean_users
+  	return users.map {|user| {id: user.id, name: user.name, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, playervalue: 0}} # TODO: change so player_value is calculateds
   end
 
   def myleague_clean(league)
