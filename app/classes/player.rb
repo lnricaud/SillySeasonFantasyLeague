@@ -6,7 +6,7 @@ class Player
     startvalue = 4000000
     sellvalue = 0.9
     salary = 0.2
-    @playerdata_id = playerdata_id
+    @id = playerdata_id
     @value = startvalue
     @sellvalue = (@value*sellvalue).round
     @salary = (@value*salary).round
@@ -17,12 +17,16 @@ class Player
     @owned = false # this indicates if the player was bought before transfer stop
   end
   def sell
+    sellvalue = 0.9
+    salary = 0.2
     @user_id = nil
     @user_name = nil
     @owned = false
     @value = @sellvalue
+    @salary = (@value*salary).round
     @topbid = @sellvalue
-    return @sellvalue
+    @sellvalue = (@value*sellvalue).round
+    return @value
   end
 end
 
