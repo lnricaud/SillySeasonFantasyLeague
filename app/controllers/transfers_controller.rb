@@ -1,53 +1,53 @@
 class TransfersController < ApplicationController
 	before_action :authenticate
 
-	def index
-		require 'json'
-		@user = current_user
-		@league = @user.league
-		@userclean = {id: @user.id, name: @user.name, team_name: @user.team_name, league_id: @user.league_id, league_name: @league.league_name, money: @user.money, gwpoints: @user.gwpoints, totpoints: @user.totpoints}
-		@users = @league.users
-		parsedata unless defined? $data # does not need to be updated
-		leagueplayers # adds league players to $leagues
-		@players = $leagues[@league.id]
-		@teams = Hash.new
-		@usersclean = Hash.new
-		@users.each do |user|
-			@teams[user.id] = user.players.map {|player| player.id} unless user.players.count == 0
-			@usersclean[user.id] = {id: user.id, name: user.name, team_name: user.team_name, league_id: user.league_id, money: user.money, gwpoints: user.gwpoints, totpoints: user.totpoints}
-		end
-		boughtplayers = @teams.values.flatten # creates array of bought player's ids (not data id)
-		@freeplayers = @league.players.map {|player| player.id}
+	# def index
+	# 	require 'json'
+	# 	@user = current_user
+	# 	@league = @user.league
+	# 	@userclean = {id: @user.id, name: @user.name, team_name: @user.team_name, league_id: @user.league_id, league_name: @league.league_name, money: @user.money, gwpoints: @user.gwpoints, totpoints: @user.totpoints}
+	# 	@users = @league.users
+	# 	parsedata unless defined? $data # does not need to be updated
+	# 	leagueplayers # adds league players to $leagues
+	# 	@players = $leagues[@league.id]
+	# 	@teams = Hash.new
+	# 	@usersclean = Hash.new
+	# 	@users.each do |user|
+	# 		@teams[user.id] = user.players.map {|player| player.id} unless user.players.count == 0
+	# 		@usersclean[user.id] = {id: user.id, name: user.name, team_name: user.team_name, league_id: user.league_id, money: user.money, gwpoints: user.gwpoints, totpoints: user.totpoints}
+	# 	end
+	# 	boughtplayers = @teams.values.flatten # creates array of bought player's ids (not data id)
+	# 	@freeplayers = @league.players.map {|player| player.id}
 
-		# @freeplayers = Array (1..$leagues[@user.league_id].length) #change this take all player ids
+	# 	# @freeplayers = Array (1..$leagues[@user.league_id].length) #change this take all player ids
 		
-		@freeplayers -= boughtplayers
+	# 	@freeplayers -= boughtplayers
 
-		# MOCK DATA #######
-		p "@userclean ---------"
-		p @userclean
-		p "@usersclean ---"
-		p @usersclean
-		p "@players ------"
-		p @players
-		p "@teams --------"
-		p @teams
-		p "@freeplayers --"
-		p @freeplayers
-
-
+	# 	# MOCK DATA #######
+	# 	p "@userclean ---------"
+	# 	p @userclean
+	# 	p "@usersclean ---"
+	# 	p @usersclean
+	# 	p "@players ------"
+	# 	p @players
+	# 	p "@teams --------"
+	# 	p @teams
+	# 	p "@freeplayers --"
+	# 	p @freeplayers
 
 
 
-		render :index
-	end
+
+
+	# 	render :index
+	# end
 
 	def newgameweek # changes to next gameweek and transfers becomes active
 		# check if user is admin
 		user = current_user
 		if user.admin
 			if transfers_active?
-				set_owned_true
+				set_owned_true # TODO: Make these two work in new format
 				subtract_salaries
 			end
 			p "<=><=><=><=><=><=> in newgameweek before calc_points"
@@ -79,61 +79,67 @@ class TransfersController < ApplicationController
 	end
 
 	def bid
+		require 'yaml'
 		bid = params[:bid].to_i
 		user = current_user
 		sentPlayer = params[:player]
-		player = Player.find sentPlayer[:id]
-		p "<=><=><=><=><=><=> in bid, player: #{player.inspect}"
-		owner = player.user
-		p "<=><=><=><=><=><=> in bid, owner: #{owner}"
-		unless player[:value] == sentPlayer[:value] && player[:user_id] == sentPlayer[:user] && player[:owned] == sentPlayer[:owned]
-			# Player has changed on the server
+		if $leagueplayers[league.id].nil?
+			loadleagueplayers(user.league) # adds this league's players to the global scope
+		end
+		byebug
+		player = $leagueplayers[user.league_id][sentPlayer["id"]]
+# Player changed on server
+		unless player.value == sentPlayer[:value] && player.user_id == sentPlayer[:user_id] && player.owned == sentPlayer[:owned]
 			render json: {err: "Player has changed on the server"}, status: 422
 		else
-#\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
-			highestBid = Log.where(player_id: player.id, league_id: user.league_id, action: "bid").order("value DESC").first
-			Log.create(action: "bid", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: bid)
-			if user == owner # updating topbid of owned player
-				highestBid.update_attributes({value: bid})
-				updated_attributes = {topbid: bid}
+			playername = $playerdata[player.id].web_name
+# Player owned by bidder, just updating the topbid
+			if user.id == sentPlayer.user_id 
+				player.topbid = bid
 			else
-				if player.user.nil? # player was a free agent
-					updated_attributes = {user_id: user.id, topbid: bid}
+# Player is a free agent, not owned by anyone
+				if player.user_id.nil?
 					fee = user.money - player.value
 					user.update_attributes(money: fee) # subtracts the value of the player from user's money
-				else # bidding on a player owned by another user
-					if bid > highestBid.value
-						# bid buys player
-						if bid < highestBid.value + 100000
-							value = bid
-						else
-							value = highestBid.value + 100000
-						end
-						updated_attributes = {value: value, user_id: user.id, owned: false, topbid: bid}
-						fee = user.money - value
+					@topbid = bid
+				  @user_id = id
+					logmessage = "#{user.team_name} bought #{playername} for £#{player.value}"
+				else
+# Bid is higher than topbid
+					owner = User.find_by_id player.user_id
+					if bid > player.topbid
+						value = (bid < (player.topbid + 100000) ? bid : (player.topbid + 100000))
+						player.topbid = bid
+						fee = user.money - player.value
 						user.update_attributes(money: fee) # user pays for the player
 						if player.owned # owner makes a profit
-							profit = owner.money + value
+							profit = owner.money + value # get's the updated value
 							owner.update_attributes(money: profit)
 						else # owner get his money back, no profit
-							refund = owner.money + player.value
+							refund = owner.money + player.value # get's back what he payed
 							owner.update_attributes(money: refund)
 						end
+						player.value = value
+						player.user_id = user.id
+						player.owned = false
+						logmessage = "#{user.team_name} successfully bought #{playername} from #{owner.team_name} for £#{player.value}"
 					else
-						# bid increases value of player for current owner
-						value = bid
-						updated_attributes = {value: value}
-						difference = owner.money - (value - player.value)
-						p "difference: #{difference}, owner money: #{owner.money}, bid: #{value}, player value: #{player.value}"
-						owner.update_attributes(money: difference) # player value increased, owner compensating for that with the difference
+# bid increases value of player for current owner
+						unless player.owned
+							value_increase = owner.money - (bid - player.value)
+							owner.update_attributes(money: value_increase)
+						end							
+						player.value = bid
+						logmessage = "#{user.team_name} unsuccessfully bid on #{playername} from #{owner.team_name} for £#{player.value}"
 					end
-					player.update_attributes(updated_attributes)		
+					player.salary
+					player.sellvalue
 				end
-				# $leagues[user.league_id][player.id][:value] = value
+				Log.create(action: "bid", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: player.value, message: logmessage)
 			end
-			player.update_attributes(updated_attributes)
-			render json: {response: "player updated"}
-#\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+			serialized_players = YAML::dump $leagueplayers[league.id]
+			league.update_attributes(players: serialized_players)
+			render json: {response: player} # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
 		end
 	end
 

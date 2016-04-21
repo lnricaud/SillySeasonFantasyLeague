@@ -1,32 +1,34 @@
 class Player
-  attr_reader :playerdata_id
-  attr_accessor :value, :sellvalue, :salary, :topbid, :gw_value, :user_id, :user_name, :owned
+  attr_reader :id, :sellvalue, :salary
+  attr_accessor :value, :topbid, :gw_value, :user_id, :user_name, :owned
 
   def initialize(playerdata_id)
     startvalue = 4000000
-    sellvalue = 0.9
-    salary = 0.2
     @id = playerdata_id
     @value = startvalue
-    @sellvalue = (@value*sellvalue).round
-    @salary = (@value*salary).round
+    @sellvalue = self.sellvalue
+    @salary = self.salary
     @topbid = startvalue
     @gw_value = startvalue
     @user_id = nil
-    @user_name = nil
-    @owned = false # this indicates if the player was bought before transfer stop
+    @owned = false # indicates if the player was bought before transfer stop
   end
   def sell
-    sellvalue = 0.9
-    salary = 0.2
     @user_id = nil
-    @user_name = nil
     @owned = false
     @value = @sellvalue
-    @salary = (@value*salary).round
     @topbid = @sellvalue
-    @sellvalue = (@value*sellvalue).round
+    @salary = self.salary
+    @sellvalue = self.sellvalue
     return @value
+  end
+  def salary
+    salary = 0.2
+    @salary = (@value*salary).round
+  end
+  def sellvalue
+    sellvalue = 0.9
+    @sellvalue = (@value*sellvalue).round
   end
 end
 

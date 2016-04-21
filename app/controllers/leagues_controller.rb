@@ -77,8 +77,8 @@ class LeaguesController < ApplicationController
 		if $leagueplayers[league.id].nil?
 			loadleagueplayers(league) # adds this league's players to the global scope
 		end
-		players = $leagueplayers[league.id].values # {id: Player, id: Player, ...}
-		p "<<<<<<>>>>>>> players: #{players}"
+		players = $leagueplayers[league.id].values # [Player, Player, ...]
+		# TODO: Set topbid to nil for other players, only owner should be able to see top bid of his own players
 		 
 		users = league.users
 		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined'], :league_id => [league.id, nil]).last(20)
