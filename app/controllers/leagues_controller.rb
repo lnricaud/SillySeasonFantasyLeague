@@ -56,7 +56,7 @@ class LeaguesController < ApplicationController
 	  	if $leagueplayers[league.id].nil?
 	  		loadleagueplayers(league) # adds this league's players to the global scope
 	  	end
-	  	Log.create(action: "joined", gameweek: current_gameweek, user_id: user.id, league_id: league.id, message: "#{user.name} joined the #{league.league_name} with team #{user.team_name}")
+	  	Log.create(action: "joined", gameweek: $current_gameweek, user_id: user.id, league_id: league.id, message: "#{user.name} joined the #{league.league_name} with team #{user.team_name}")
 
 			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69' # TODO: move this to env
 			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
@@ -82,7 +82,7 @@ class LeaguesController < ApplicationController
 		 
 		users = league.users
 		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined'], :league_id => [league.id, nil]).last(20)
-		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, playerdata: $playerdata, logs: logs.reverse, money: user.money, gameweek: current_gameweek, transfersactive: transfers_active?} 
+		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, playerdata: $playerdata, logs: logs.reverse, money: user.money, gameweek: $current_gameweek, transfersactive: $transfers_active} 
 	end
 
 	def all

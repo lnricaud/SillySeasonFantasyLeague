@@ -90,17 +90,17 @@ module PlayersHelper
 	end
 	
 	def getplayerpoints
-		gw = current_gameweek
+		# gw = current_gameweek
 		# get gw points for all players
 		owned_players = Player.where(owned: true)
 		points = Hash.new
-		gwpoints = owned_players.each_with_object(Hash.new(0)) { |player, counts| counts[player.user_id] += $data[player.id][:fixtures_played][gw - 1][19] }
+		gwpoints = owned_players.each_with_object(Hash.new(0)) { |player, counts| counts[player.user_id] += $data[player.id][:fixtures_played][$current_gameweek - 1][19] }
 		# loop through gw points, create log for gw points for each user. Increase money for each user. 
 		p "GW: #{gw}, Points: #{gwpoints}"
 		users = User.all
 		gwpoints.each do |user_id, points|
 			user = users.find_by_id user_id
-			Log.create(action: 'gwpoints', game_week: gw, user_id: user_id, league_id: user.league_id, value: points)
+			Log.create(action: 'gwpoints', game_week: $current_gameweek, user_id: user_id, league_id: user.league_id, value: points)
 			money = user.money + points * 1000000
 			totpoints = user.totpoints + points
 			user.update_attributes(money: money, gwpoints: points, totpoints: totpoints)

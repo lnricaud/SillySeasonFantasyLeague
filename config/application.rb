@@ -53,9 +53,14 @@ module SillySeasonFantasyLeague
       p "Init $playerdata"
       require 'yaml'
       require 'player'
-      gwlog = Log.where(action: "newgameweek").last
-      $current_gameweek = (gwlog.nil? ? 1 : gwlog.game_week)
-      $transfers_active = !Log.exists?({game_week: $current_gameweek, action: "stoptransfers"})
+      if Log.table_exists?
+        gwlog = Log.where(action: "newgameweek").last
+        $current_gameweek = (gwlog.nil? ? 1 : gwlog.game_week)
+        $transfers_active = !Log.exists?({game_week: $current_gameweek, action: "stoptransfers"})
+      else
+        $current_gameweek = 1
+        $transfers_active = true
+      end
       $leagueplayers = Hash.new # $leagueplayers[league_id] = {id: Player, id: Player, ...} Users login their players are added from the db to this global variable to reduce calls the the db.
       $playerdata = Hash.new
       if Playerdata.table_exists?

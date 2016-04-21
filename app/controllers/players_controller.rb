@@ -10,7 +10,6 @@ class PlayersController < ApplicationController
 		user = current_user
 		if user.admin
 			
-			gw = current_gameweek
 			playersadded = false # do not update league.players unless new players has been added
 			$leagueplayers = Hash.new # resets the global variable so that will contain updated data
 			league_players = Hash.new # league_players[league_id] = {id: Player, id: Player, ...} <- League.players
@@ -41,7 +40,7 @@ class PlayersController < ApplicationController
 						league_players.map {|league_id, players| players[i] = Player.new(i)}
 					end
 					if newplayer # only create log if not start of season
-					Log.create(action: "newplayer", game_week: gw, player_id: i, message: "#{player_data["web_name"]} added to #{player_data["team_name"]}")
+					Log.create(action: "newplayer", game_week: $current_gameweek, player_id: i, message: "#{player_data["web_name"]} added to #{player_data["team_name"]}")
 					end
 				end
 				# add player to $playerdata hash

@@ -53,10 +53,10 @@ class TransfersController < ApplicationController
 			p "<=><=><=><=><=><=> in newgameweek before calc_points"
 			calc_points
 			p "<=><=><=><=><=><=> in newgameweek after calc_points"
-			nextGW = current_gameweek + 1
-			log = Log.create(action: 'newgameweek', game_week: nextGW)
+			$current_gameweek += $current_gameweek
+			log = Log.create(action: 'newgameweek', game_week: $current_gameweek, user_id: user.id)
 			p log
-			render json: {response: 'New Game Week', gameweek: nextGW}
+			render json: {response: 'New Game Week', gameweek: $current_gameweek}
 		else
 			render json: {err: 'Not Autherized to Start New GameWeek'}, status: 401
 		end 
@@ -68,7 +68,7 @@ class TransfersController < ApplicationController
 			p "in stop transfers"
 			set_owned_true
 			subtract_salaries
-			log = Log.create(action: "stoptransfers", game_week: current_gameweek)
+			log = Log.create(action: "stoptransfers", game_week: $current_gameweek, user_id: user.id)
 			p "log created: #{log}"
 			render json: {response: 'Transfers Stopped'}
 		elsif transfers_active?
@@ -83,10 +83,9 @@ class TransfersController < ApplicationController
 		bid = params[:bid].to_i
 		user = current_user
 		sentPlayer = params[:player]
-		if $leagueplayers[league.id].nil?
+		if $leagueplayers[user.league_id].nil?
 			loadleagueplayers(user.league) # adds this league's players to the global scope
 		end
-		byebug
 		player = $leagueplayers[user.league_id][sentPlayer["id"]]
 # Player changed on server
 		unless player.value == sentPlayer[:value] && player.user_id == sentPlayer[:user_id] && player.owned == sentPlayer[:owned]
@@ -94,7 +93,7 @@ class TransfersController < ApplicationController
 		else
 			playername = $playerdata[player.id].web_name
 # Player owned by bidder, just updating the topbid
-			if user.id == sentPlayer.user_id 
+			if user.id == player.user_id 
 				player.topbid = bid
 			else
 # Player is a free agent, not owned by anyone
@@ -102,7 +101,7 @@ class TransfersController < ApplicationController
 					fee = user.money - player.value
 					user.update_attributes(money: fee) # subtracts the value of the player from user's money
 					@topbid = bid
-				  @user_id = id
+				  @user_id = user.id
 					logmessage = "#{user.team_name} bought #{playername} for £#{player.value}"
 				else
 # Bid is higher than topbid
@@ -137,8 +136,8 @@ class TransfersController < ApplicationController
 				end
 				Log.create(action: "bid", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: player.value, message: logmessage)
 			end
-			serialized_players = YAML::dump $leagueplayers[league.id]
-			league.update_attributes(players: serialized_players)
+			serialized_players = YAML::dump $leagueplayers[user.league_id]
+			user.league.update_attributes(players: serialized_players)
 			render json: {response: player} # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
 		end
 	end
@@ -157,8 +156,8 @@ class TransfersController < ApplicationController
 				loss = user.money - (player.value * 0.1).round
 				user.update_attributes(money: loss)
 			end
-			Log.create(action: "sell", game_week: current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: value)
-			Log.where(action: "bid", game_week: current_gameweek, player_id: player.id, league_id: user.league_id).update_all(action: "old_bid")
+			Log.create(action: "sell", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: value)
+			Log.where(action: "bid", game_week: $current_gameweek, player_id: player.id, league_id: user.league_id).update_all(action: "old_bid")
 			player.update_attributes(user_id: nil, value: value ,owned: false, topbid: nil)
 			render json: {response: 'player sold', money: current_user.money}
 		else # player has been bought by someone already or couldn't be found
@@ -184,7 +183,7 @@ class TransfersController < ApplicationController
 			salary = (salaries[owner.id] * 0.1).round # SALARY SET HERE, currently 10% of value
 			money = owner.money - salary 
 			owner.update_attributes(money: money)
-			Log.create(action: "salaries", game_week: current_gameweek, user_id: owner.id, league_id: owner.league_id, value: salary)
+			Log.create(action: "salaries", game_week: $current_gameweek, user_id: owner.id, league_id: owner.league_id, value: salary)
 		end
 	end
 
