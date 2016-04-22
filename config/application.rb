@@ -61,7 +61,6 @@ module SillySeasonFantasyLeague
         $current_gameweek = 1
         $transfers_active = true
       end
-      $leagueplayers = Hash.new # $leagueplayers[league_id] = {id: Player, id: Player, ...} Users login their players are added from the db to this global variable to reduce calls the the db.
       $playerdata = Hash.new
       if Playerdata.table_exists?
         db_player_data = Playerdata.last

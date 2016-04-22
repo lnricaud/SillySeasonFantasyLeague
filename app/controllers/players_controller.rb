@@ -11,11 +11,10 @@ class PlayersController < ApplicationController
 		if user.admin
 			
 			playersadded = false # do not update league.players unless new players has been added
-			$leagueplayers = Hash.new # resets the global variable so that will contain updated data
-			league_players = Hash.new # league_players[league_id] = {id: Player, id: Player, ...} <- League.players
+			leagueplayers = Hash.new # leagueplayers[league_id] = {id: Player, id: Player, ...} <- League.players
 			leagues = League.all
 			unless leagues.nil?
-				leagues.each { |league| league_players[league.id] = YAML::load league.players }
+				leagues.each { |league| leagueplayers[league.id] = YAML::load league.players }
 			end
 			db_player_data = Playerdata.last
 			if db_player_data.nil?
@@ -35,9 +34,9 @@ class PlayersController < ApplicationController
 				  break  
 				end  
 				if $playerdata[i].nil? # Add player class to each league
-					unless league_players.empty?
+					unless leagueplayers.empty?
 						playersadded = true # update league.players
-						league_players.map {|league_id, players| players[i] = Player.new(i)}
+						leagueplayers.map {|league_id, players| players[i] = Player.new(i)}
 					end
 					if newplayer # only create log if not start of season
 					Log.create(action: "newplayer", game_week: $current_gameweek, player_id: i, message: "#{player_data["web_name"]} added to #{player_data["team_name"]}")
@@ -53,7 +52,7 @@ class PlayersController < ApplicationController
 			serialized_playerdata = YAML::dump($playerdata)
 			Playerdata.create(data: serialized_playerdata)
 			if playersadded && !leagues.nil? # update players in each league
-				leagues.each {|league| league.update_attributes(players: YAML::dump(league_players[league.id]))}
+				leagues.each {|league| league.update_attributes(players: YAML::dump(leagueplayers[league.id]))}
 			end
 			render json: {response: 'Player Data Refreshed'}
 		else

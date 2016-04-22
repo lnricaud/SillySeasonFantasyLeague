@@ -82,11 +82,10 @@ class TransfersController < ApplicationController
 		require 'yaml'
 		bid = params[:bid].to_i
 		user = current_user
+		league = user.league
 		sentPlayer = params[:player]
-		if $leagueplayers[user.league_id].nil?
-			loadleagueplayers(user.league) # adds this league's players to the global scope
-		end
-		player = $leagueplayers[user.league_id][sentPlayer["id"]]
+		players = YAML::load league.players
+		player = players[sentPlayer["id"]]
 # Player changed on server
 		unless player.value == sentPlayer[:value] && player.user_id == sentPlayer[:user_id] && player.owned == sentPlayer[:owned]
 			render json: {err: "Player has changed on the server"}, status: 422
@@ -136,7 +135,7 @@ class TransfersController < ApplicationController
 				end
 				Log.create(action: "bid", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: player.value, message: logmessage)
 			end
-			serialized_players = YAML::dump $leagueplayers[user.league_id]
+			serialized_players = YAML::dump players
 			user.league.update_attributes(players: serialized_players)
 			render json: {response: player} # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
 		end

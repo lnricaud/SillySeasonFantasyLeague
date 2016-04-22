@@ -26,7 +26,6 @@ class LeaguesController < ApplicationController
 			# redirect_to "/leagues/new"
 			render json: {error: "League not created: #{params}"}, status: :unprocessable_entity
 		else # League Successfully created
-			$leagueplayers[league.id] = this_leagues_players # add league players to global hash
 			updated_attributes = {:league_id => league.id}
 			user.update_attributes(updated_attributes)
 			
@@ -53,9 +52,6 @@ class LeaguesController < ApplicationController
 	  	p "league.id #{params["id"]}"
 	  	updated_attributes = {:league_id => league.id}
 	  	user.update_attributes(updated_attributes)
-	  	if $leagueplayers[league.id].nil?
-	  		loadleagueplayers(league) # adds this league's players to the global scope
-	  	end
 	  	Log.create(action: "joined", gameweek: $current_gameweek, user_id: user.id, league_id: league.id, message: "#{user.name} joined the #{league.league_name} with team #{user.team_name}")
 
 			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69' # TODO: move this to env
@@ -71,13 +67,11 @@ class LeaguesController < ApplicationController
   end
 
 	def myleague
+		require 'yaml'
 		user = current_user
 		league = user.league
-		p "league: #{league.inspect}"
-		if $leagueplayers[league.id].nil?
-			loadleagueplayers(league) # adds this league's players to the global scope
-		end
-		players = $leagueplayers[league.id].values # [Player, Player, ...]
+		players = YAML::load league.players
+		players = players.values # [Player, Player, ...]
 		# TODO: Set topbid to nil for other players, only owner should be able to see top bid of his own players
 		users = league.users
 		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined', 'bid'], :league_id => [league.id, nil]).last(20)
