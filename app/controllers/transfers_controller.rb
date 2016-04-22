@@ -100,8 +100,8 @@ class TransfersController < ApplicationController
 				if player.user_id.nil?
 					fee = user.money - player.value
 					user.update_attributes(money: fee) # subtracts the value of the player from user's money
-					@topbid = bid
-				  @user_id = user.id
+					player.topbid = bid
+				  player.user_id = user.id
 					logmessage = "#{user.team_name} bought #{playername} for £#{player.value}"
 				else
 # Bid is higher than topbid

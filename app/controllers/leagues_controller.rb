@@ -79,9 +79,8 @@ class LeaguesController < ApplicationController
 		end
 		players = $leagueplayers[league.id].values # [Player, Player, ...]
 		# TODO: Set topbid to nil for other players, only owner should be able to see top bid of his own players
-		 
 		users = league.users
-		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined'], :league_id => [league.id, nil]).last(20)
+		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined', 'bid'], :league_id => [league.id, nil]).last(20)
 		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, playerdata: $playerdata, logs: logs.reverse, money: user.money, gameweek: $current_gameweek, transfersactive: $transfers_active} 
 	end
 
