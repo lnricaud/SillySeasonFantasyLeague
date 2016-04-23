@@ -101,7 +101,7 @@ class TransfersController < ApplicationController
 					user.update_attributes(money: fee) # subtracts the value of the player from user's money
 					player.topbid = bid
 				  player.user_id = user.id
-					logmessage = "#{user.team_name} bought #{playername} for £#{player.value}"
+					logmessage = "#{user.team_name} bought #{playername} for #{currency(player.value)}"
 				else
 # Bid is higher than topbid
 					owner = User.find_by_id player.user_id
@@ -120,7 +120,7 @@ class TransfersController < ApplicationController
 						player.value = value
 						player.user_id = user.id
 						player.owned = false
-						logmessage = "#{user.team_name} successfully bought #{playername} from #{owner.team_name} for £#{player.value}"
+						logmessage = "#{user.team_name} successfully bought #{playername} from #{owner.team_name} for #{currency(player.value)}"
 					else
 # bid increases value of player for current owner
 						unless player.owned
@@ -128,7 +128,7 @@ class TransfersController < ApplicationController
 							owner.update_attributes(money: value_increase)
 						end							
 						player.value = bid
-						logmessage = "#{user.team_name} unsuccessfully bid on #{playername} from #{owner.team_name} for £#{player.value}"
+						logmessage = "#{user.team_name} unsuccessfully bid #{currency(bid)} on #{playername} from #{owner.team_name}"
 					end
 					player.salary
 					player.sellvalue
@@ -136,29 +136,34 @@ class TransfersController < ApplicationController
 				Log.create(action: "bid", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: player.value, message: logmessage)
 			end
 			serialized_players = YAML::dump players
-			user.league.update_attributes(players: serialized_players)
+			league.update_attributes(players: serialized_players)
 			render json: {updatedPlayer: player} # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
 		end
 	end
 
 	def sell
+		require 'yaml'
 		p "-- In transfers#sell params: #{params}"
+		sell_id = params[:id].to_i
 		user = current_user
-		player = Player.where(id: params[:id], league_id: user.league_id).first
-		# update player to have user_id, topbid and owned false
-		if player.user_id == user.id # change this back to ==
-			value = (player.value * 0.9).round
-			# if player was owned refund 90%
+		league = user.league
+		players = YAML::load league.players
+		player = players[sell_id]
+		if player.user_id == user.id
+			# if player was owned refund sellvalue
 			if player.owned
+				value = player.sell
 				user.update_attributes(money: user.money + value)
+				sellmessage = "#{user.team_name} sold #{$playerdata[sell_id].web_name} for #{currency(value)}"
 			else # else subtract 10% of player value
-				loss = user.money - (player.value * 0.1).round
-				user.update_attributes(money: loss)
+				loss = (player.sell / 9).round
+				user.update_attributes(money: user.money - loss)
+				sellmessage = "#{user.team_name} sold #{$playerdata[sell_id].web_name} for #{currency(player.value)} and made a loss of #{currency(loss)}"
 			end
-			Log.create(action: "sell", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: value)
-			Log.where(action: "bid", game_week: $current_gameweek, player_id: player.id, league_id: user.league_id).update_all(action: "old_bid")
-			player.update_attributes(user_id: nil, value: value ,owned: false, topbid: nil)
-			render json: {response: 'player sold', money: current_user.money}
+			Log.create(action: "sell", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: league.id, value: value, message: sellmessage)
+			serialized_players = YAML::dump players
+			league.update_attributes(players: serialized_players)
+			render json: {response: 'player sold', money: user.money, updatedPlayer: player}
 		else # player has been bought by someone already or couldn't be found
 			render json: {err: 'Player was no longer yours', updatedPlayer: player}, :status => 422
 		end

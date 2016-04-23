@@ -1,10 +1,11 @@
 module TransfersHelper
-	# def current_gameweek
-	# 	gwlog = Log.where(action: "newgameweek").last
-	# 	return (gwlog.nil? ? 1 : gwlog.game_week)
-	# end
-
-	# def transfers_active?
-	# 	!Log.exists?({game_week: current_gameweek, action: "stoptransfers"})
-	# end
+	def currency(value)
+		str = value.to_s
+		currency = ""
+		while str.length > 3
+			currency = ",#{str[-3,3]}#{currency}"
+			str = str[0...-3]
+		end
+		return "£#{str}#{currency}"
+	end
 end

@@ -40,6 +40,7 @@ class LeaguesController < ApplicationController
 	end
 
   def join
+  	# TODO: Make sure team names are unique
   	p "join league params: #{params}"
   	user = current_user
   	p "user.email #{user.email}"
@@ -52,7 +53,7 @@ class LeaguesController < ApplicationController
 	  	p "league.id #{params["id"]}"
 	  	updated_attributes = {:league_id => league.id}
 	  	user.update_attributes(updated_attributes)
-	  	Log.create(action: "joined", gameweek: $current_gameweek, user_id: user.id, league_id: league.id, message: "#{user.name} joined the #{league.league_name} with team #{user.team_name}")
+	  	Log.create(action: "joined", game_week: $current_gameweek, user_id: user.id, league_id: league.id, message: "#{user.name} joined #{league.league_name} with team #{user.team_name}")
 
 			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69' # TODO: move this to env
 			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
