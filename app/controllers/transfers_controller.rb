@@ -137,7 +137,7 @@ class TransfersController < ApplicationController
 			end
 			serialized_players = YAML::dump players
 			user.league.update_attributes(players: serialized_players)
-			render json: {response: player} # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
+			render json: {updatedPlayer: player} # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
 		end
 	end
 
@@ -160,7 +160,7 @@ class TransfersController < ApplicationController
 			player.update_attributes(user_id: nil, value: value ,owned: false, topbid: nil)
 			render json: {response: 'player sold', money: current_user.money}
 		else # player has been bought by someone already or couldn't be found
-			render json: {err: 'Player was no longer yours', player: player}, :status => 422
+			render json: {err: 'Player was no longer yours', updatedPlayer: player}, :status => 422
 		end
 	end
 
