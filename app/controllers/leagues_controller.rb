@@ -76,7 +76,7 @@ class LeaguesController < ApplicationController
 		# TODO: Set topbid to nil for other players, only owner should be able to see top bid of his own players
 		users = league.users
 		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined', 'bid'], :league_id => [league.id, nil]).last(20)
-		render json: {league: myleague_clean(league), users: league_users_clean(users), players: players, playerdata: $playerdata, logs: logs.reverse, money: user.money, gameweek: $current_gameweek, transfersactive: $transfers_active} 
+		render json: {league: myleague_clean(league), users: league_users_clean(users, team_value(players)), players: players, playerdata: $playerdata, logs: logs.reverse, money: user.money, gameweek: $current_gameweek, transfersactive: $transfers_active} 
 	end
 
 	def all
@@ -92,16 +92,22 @@ class LeaguesController < ApplicationController
 
   private
 
-  def league_users_clean(users)
-  	return users.map {|user| {id: user.id, name: user.name, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, playervalue: 0}} # TODO: change so player_value is calculateds
+  def league_users_clean(users, teamvalue)
+  	return users.map {|user| {id: user.id, name: user.name, team_name: user.team_name, money: user.money, totpoints: user.totpoints, gwpoints: user.gwpoints, teamvalue: teamvalue[user.id] || 0}}
   end
 
   def myleague_clean(league)
   	return {id: league.id, league_name: league.league_name}
   end
 
-  def player_value(players)
-  	return players.inject(0) { |value, player| value + player.value }
+  def team_value(players) # sum up player value of each team
+  	teamvalues = {}
+  	players.each do |player|
+  		if player.user_id
+  			teamvalues[player.user_id] = (teamvalues[player.user_id] || 0) + player.value
+  		end
+  	end
+  	return teamvalues
   end
 
   def league_owner(users, owner_id)
