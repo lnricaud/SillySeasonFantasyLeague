@@ -1,3 +1,5 @@
+require 'yaml'
+
 class TransfersController < ApplicationController
 	before_action :authenticate
 
@@ -22,10 +24,8 @@ class TransfersController < ApplicationController
 			if $transfers_active
 				subtract_salaries_and_set_owned_true
 			end
-			p "<=><=><=><=><=><=> in newgameweek before calc_points"
 			calc_points
-			p "<=><=><=><=><=><=> in newgameweek after calc_points"
-			$current_gameweek += $current_gameweek
+			$current_gameweek += 1
 			Log.create(action: 'newgameweek', game_week: $current_gameweek, user_id: user.id)
 			$transfers_active = true
 			render json: {response: 'New Game Week', gameweek: $current_gameweek}
@@ -35,7 +35,6 @@ class TransfersController < ApplicationController
 	end
 
 	def bid
-		require 'yaml'
 		bid = params[:bid].to_i
 		user = current_user
 		league = user.league
@@ -98,7 +97,6 @@ class TransfersController < ApplicationController
 	end
 
 	def sell
-		require 'yaml'
 		p "-- In transfers#sell params: #{params}"
 		sell_id = params[:id].to_i
 		user = current_user
@@ -127,7 +125,6 @@ class TransfersController < ApplicationController
 
 	private
 	def calc_points
-		require 'yaml'
 		leagues = League.all
 		leagues.each do |league|
 			players = YAML::load league.players
@@ -161,7 +158,6 @@ class TransfersController < ApplicationController
 	end
 
 	def subtract_salaries_and_set_owned_true
-		require 'yaml'
 		$transfers_active = false
 		leagues = League.all
 		leagues.each do |league|
