@@ -3,9 +3,9 @@ class TransfersController < ApplicationController
 
 	def stoptransfers
 		user = current_user
-		unless $transfers_active
-			render json: {err: 'Transfers already Stopped'}, status: 422
-		elsif user.admin
+		# if !$transfers_active
+		# 	render json: {err: 'Transfers already Stopped'}, status: 422
+		if user.admin
 			p "in stop transfers"
 			subtract_salaries_and_set_owned_true
 			log = Log.create(action: "stoptransfers", game_week: $current_gameweek, user_id: user.id)
@@ -132,20 +132,30 @@ class TransfersController < ApplicationController
 		leagues.each do |league|
 			players = YAML::load league.players
 			users = league.users
-			points = {}
-			players.each do |player|
-				if player.owned
-					salaries[player.user_id] = (salaries[player.user_id] || 0) + player.salary
+			points = {"Goalkeeper" => {}, "Defender" => {}, "Midfielder" => {}, "Forward" => {}}
+			players.each do |id, player| 
+				if player.user_id
+					if points[$playerdata[id].position][player.user_id].nil?
+						points[$playerdata[id].position][player.user_id] = [$playerdata[id].gw_points]
+					else
+						points[$playerdata[id].position][player.user_id].push($playerdata[id].gw_points)		
+					end
 				end
 			end
-			unless salaries[user.id].nil?
-				users.each {|user| user.update_attributes(money: user.money - salaries[user.id])}
+			users.each do |user| # add up points
+				arr = points["Goalkeeper"][user.id] || [0]
+				gw_team_points = arr.max
+				arr = points["Defender"][user.id] || [0]
+				gw_team_points += (arr.size > 3 ? arr.sort[-3,3].inject(:+) : arr.inject(:+))
+				arr = points["Defender"][user.id] || [0]
+				gw_team_points += (arr.size > 4 ? arr.sort[-4,4].inject(:+) : arr.inject(:+))
+				arr = points["Forward"][user.id] || [0]
+				gw_team_points += (arr.size > 3 ? arr.sort[-3,3].inject(:+) : arr.inject(:+))
+				p "user: #{user.name} got #{gw_team_points} points and #{currency(gw_team_points * 1000000)}"
+				totpoints = user.totpoints + gw_team_points
+				earnings = user.money + (gw_team_points * 1000000)
+				user.update_attributes(gwpoints: gw_team_points, totpoints: totpoints, money: earnings)
 			end
-			players.map do |player| # update owned players and gw_value
-
-			end
-			serialized_players = YAML::dump players
-			league.update_attributes(players: serialized_players)
 		end
 
 	end
@@ -158,17 +168,15 @@ class TransfersController < ApplicationController
 			players = YAML::load league.players
 			users = league.users
 			salaries = {}
-			players.each do |player|
+			players.each do |id, player|
 				if player.owned
 					salaries[player.user_id] = (salaries[player.user_id] || 0) + player.salary
 				end
 			end
-			unless salaries[user.id].nil?
-				users.each {|user| user.update_attributes(money: user.money - salaries[user.id])}
-			end
-			players.map do |player| # update owned players and gw_value
+			users.each {|user| unless salaries[user.id].nil? then user.update_attributes(money: user.money - salaries[user.id]) end}
+			players.map do |id, player| # update owned players and gw_value
 				player.owned = (player.user_id ? true : false)
-				# maybe decrease value for unowned players as well
+				# maybe decrease value for un-owned players as well
 				player.gw_value = player.value
 			end
 			serialized_players = YAML::dump players
