@@ -4,7 +4,5 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :null_session
 
   include SessionsHelper
-  include TransfersHelper
-  include PlayersHelper
   include Knock::Authenticable
 end

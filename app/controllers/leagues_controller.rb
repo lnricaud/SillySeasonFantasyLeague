@@ -1,9 +1,10 @@
+require 'player'
+require 'yaml'
+
 class LeaguesController < ApplicationController
 	# before_action :authenticate
 
 	def create
-		require 'player'
-		require 'yaml'
 		user = current_user
 		p "--- in leagues#create ---"
 		p "#{params}"
@@ -68,7 +69,6 @@ class LeaguesController < ApplicationController
   end
 
 	def myleague
-		require 'yaml'
 		user = current_user
 		league = user.league
 		players = YAML::load league.players
@@ -80,7 +80,6 @@ class LeaguesController < ApplicationController
 	end
 
 	def all
-		require 'yaml'
 		leagues = League.all
 		leagues_json = []
 		leagues.each do |league|
