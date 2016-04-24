@@ -27,7 +27,7 @@ class Player
     @salary = (@value*salary).round
   end
   def sellvalue
-    sellvalue = 0.9
+    sellvalue = 0.8
     @sellvalue = (@value*sellvalue).round
   end
 end
