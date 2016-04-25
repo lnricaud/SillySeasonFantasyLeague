@@ -134,12 +134,13 @@ class TransfersController < ApplicationController
 					end
 				end
 			end
+			p points
 			users.each do |user| # add up points
 				arr = points["Goalkeeper"][user.id] || [0]
 				gw_team_points = arr.max
 				arr = points["Defender"][user.id] || [0]
 				gw_team_points += (arr.size > 3 ? arr.sort[-3,3].inject(:+) : arr.inject(:+))
-				arr = points["Defender"][user.id] || [0]
+				arr = points["Midfielder"][user.id] || [0]
 				gw_team_points += (arr.size > 4 ? arr.sort[-4,4].inject(:+) : arr.inject(:+))
 				arr = points["Forward"][user.id] || [0]
 				gw_team_points += (arr.size > 3 ? arr.sort[-3,3].inject(:+) : arr.inject(:+))
