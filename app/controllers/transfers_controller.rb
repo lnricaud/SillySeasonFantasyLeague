@@ -46,6 +46,7 @@ class TransfersController < ApplicationController
 			render json: {err: "Player has changed on the server"}, status: 422
 		else
 			playername = $playerdata[player.id].web_name
+			ownermoney = {id: nil, money: nil}
 # Player owned by bidder, just updating the topbid
 			if user.id == player.user_id 
 				player.topbid = bid
@@ -63,7 +64,7 @@ class TransfersController < ApplicationController
 					if bid > player.topbid
 						value = (bid < (player.topbid + 100000) ? bid : (player.topbid + 100000))
 						player.topbid = bid
-						fee = user.money - player.value
+						fee = user.money - value
 						user.update_attributes(money: fee) # user pays for the player
 						if player.owned # owner makes a profit
 							profit = owner.money + value # get's the updated value
@@ -85,6 +86,7 @@ class TransfersController < ApplicationController
 						player.value = bid
 						logmessage = "#{user.team_name} unsuccessfully bid #{currency(bid)} on #{playername} from #{owner.team_name}"
 					end
+					ownermoney = {id: owner.id, money: owner.money}
 					player.salary
 					player.sellvalue
 				end
@@ -92,7 +94,7 @@ class TransfersController < ApplicationController
 			end
 			serialized_players = YAML::dump players
 			league.update_attributes(players: serialized_players)
-			render json: {updatedPlayer: player} # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
+			render json: {updatedPlayer: player, usermoney: user.money, owner_id: ownermoney[:id], ownermoney: ownermoney[:money], } # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
 		end
 	end
 
