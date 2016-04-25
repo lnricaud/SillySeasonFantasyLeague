@@ -106,17 +106,10 @@ class TransfersController < ApplicationController
 		players = YAML::load league.players
 		player = players[sell_id]
 		if player.user_id == user.id
-			# if player was owned refund sellvalue
-			if player.owned
-				value = player.sell
-				user.update_attributes(money: user.money + value)
-				sellmessage = "#{user.team_name} sold #{$playerdata[sell_id].web_name} for #{currency(value)}"
-			else # else subtract 10% of player value
-				loss = (player.sell / 9).round
-				user.update_attributes(money: user.money - loss)
-				sellmessage = "#{user.team_name} sold #{$playerdata[sell_id].web_name} for #{currency(player.value)} and made a loss of #{currency(loss)}"
-			end
-			Log.create(action: "sell", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: league.id, value: value, message: sellmessage)
+			sellvalue = player.sell
+			user.update_attributes(money: user.money + sellvalue)
+			sellmessage = "#{user.team_name} sold #{$playerdata[sell_id].web_name} for #{currency(sellvalue)}"
+			Log.create(action: "sell", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: league.id, value: sellvalue, message: sellmessage)
 			serialized_players = YAML::dump players
 			league.update_attributes(players: serialized_players)
 			render json: {response: 'player sold', money: user.money, updatedPlayer: player}
