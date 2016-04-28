@@ -2,40 +2,25 @@ require 'player'
 require 'yaml'
 
 class LeaguesController < ApplicationController
-	# before_action :authenticate
 
 	def create
 		user = current_user
-		p "--- in leagues#create ---"
-		p "#{params}"
-		p "user.email: #{user.email}"
-		p "create league params: #{params}"
-		p "current_user.id #{user.id}"
-		# league_params = {:league_name => params["league"]["league_name"], :user_id => user.id, }
 		league_params = params.permit(:league_name, :password)
 		league_params[:user_id] = user.id
-		# adding players
 		this_leagues_players = Hash.new
 		$playerdata.each {|id, player| this_leagues_players[id] = Player.new(id)}
 		league_params[:players] = YAML::dump this_leagues_players
-		
-		p "CREATING A LEAGUE: #{league_params}"
 		league = League.create(league_params)
-		p "League created? #{!league.nil?}, id: #{league.id}"
 		if league.id.nil?
 			p "ERROR! League not created!"
-			# redirect_to "/leagues/new"
 			render json: {error: "League not created: #{params}"}, status: :unprocessable_entity
 		else # League Successfully created
 			updated_attributes = {:league_id => league.id}
 			user.update_attributes(updated_attributes)
-			
-			# Create new token that includes the 
 			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69' # TODO: move this to env
 			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
 			p "payload: #{payload}"
 			token = JWT.encode payload, hmac_secret, 'HS256'
-
 			render json: {id_token: token} 
 		end
 	end
@@ -55,12 +40,10 @@ class LeaguesController < ApplicationController
 	  	updated_attributes = {:league_id => league.id}
 	  	user.update_attributes(updated_attributes)
 	  	Log.create(action: "joined", game_week: $current_gameweek, user_id: user.id, league_id: league.id, message: "#{user.name} joined #{league.league_name} with team #{user.team_name}")
-
 			hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69' # TODO: move this to env
 			payload = {name: user.name, email: user.email, id: user.id, team_name: user.team_name, league_id: user.league_id}
 			p "payload: #{payload}"
 			token = JWT.encode payload, hmac_secret, 'HS256'
-
 			p "Success! render json: {id_token: token}"
 			render json: {id_token: token}
 		else # wrong password
@@ -86,7 +69,8 @@ class LeaguesController < ApplicationController
 			users = league.users
 			owner = league_owner(users, league.user_id)
 			players = YAML::load league.players
-			leagues_json.push({league: league, owner: owner ,users: league_users_clean(users, team_value(players.values)), teams: users.length})
+			players = players.values 
+			leagues_json.push({league: league, owner: owner ,users: league_users_clean(users, team_value(players)), teams: users.length})
 		end 
 		render json: leagues_json
 	end
