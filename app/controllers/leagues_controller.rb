@@ -55,8 +55,8 @@ class LeaguesController < ApplicationController
 		user = current_user
 		league = user.league
 		players = YAML::load league.players
-		players = players.values # [Player, Player, ...]
-		# TODO: Set topbid to nil for other players, only owner should be able to see top bid of his own players
+		players = players.values
+		players = players.each{|player| if player.user_id != user.id then player.topbid = nil end}
 		users = league.users
 		logs = Log.where(:action => ['transfer', 'sell', 'newplayer', 'joined', 'bid'], :league_id => [league.id, nil]).last(20)
 		render json: {league: myleague_clean(league), users: league_users_clean(users, team_value(players)), players: players, playerdata: $playerdata, logs: logs.reverse, money: user.money, gameweek: $current_gameweek, transfersactive: $transfers_active} 
@@ -69,8 +69,7 @@ class LeaguesController < ApplicationController
 			users = league.users
 			owner = league_owner(users, league.user_id)
 			players = YAML::load league.players
-			players = players.values 
-			leagues_json.push({league: league, owner: owner ,users: league_users_clean(users, team_value(players)), teams: users.length})
+			leagues_json.push({league: league, owner: owner ,users: league_users_clean(users, team_value(players.values)), teams: users.length})
 		end 
 		render json: leagues_json
 	end
