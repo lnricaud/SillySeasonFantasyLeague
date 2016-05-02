@@ -2,6 +2,7 @@ class SessionsController < ApplicationController
 
 	def create
 	  user_params = params.require(:session).permit(:email, :password)
+	  user_params[:email] = user_params[:email].downcase
 	  user = User.confirm(user_params)
 	  if user
 	  	hmac_secret = '4eda0940f4b680eaa3573abedb9d34dc5f878d241335c4f9ef189fd0c874e078ad1a658f81853b69a6334b2109c3bc94852997c7380ccdebbe85d766947fde69'

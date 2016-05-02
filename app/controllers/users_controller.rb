@@ -5,6 +5,7 @@ class UsersController < ApplicationController
 	def create
 		p "user#create, params: #{params}"
 		user_params = params.permit(:name, :team_name, :email, :password)
+		user_params[:email] = user_params[:email].downcase
 		p "CREATING A USER #{user_params}"
 		@user = User.create(user_params)
 		p "User created? #{!@user.id.nil?}, #{@user.id}"

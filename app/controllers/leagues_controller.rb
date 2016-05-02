@@ -70,7 +70,7 @@ class LeaguesController < ApplicationController
 			owner = league_owner(users, league.user_id)
 			players = YAML::load league.players
 			leagues_json.push({league: league, owner: owner ,users: league_users_clean(users, team_value(players.values)), teams: users.length})
-		end 
+		end
 		render json: leagues_json
 	end
 
