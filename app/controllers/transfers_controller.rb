@@ -161,7 +161,7 @@ class TransfersController < ApplicationController
 			users = league.users
 			salaries = {}
 			players.each do |id, player|
-				if player.owned
+				if player.user_id
 					salaries[player.user_id] = (salaries[player.user_id] || 0) + player.salary
 				end
 			end
