@@ -35,86 +35,94 @@ class TransfersController < ApplicationController
 	end
 
 	def bid
-		bid = params[:bid].to_i
-		user = current_user
-		league = user.league
-		sentPlayer = params[:player]
-		players = YAML::load league.players
-		player = players[sentPlayer["id"]]
-# Player changed on server
-		unless player.value == sentPlayer[:value] && player.user_id == sentPlayer[:user_id] && player.owned == sentPlayer[:owned]
-			render json: {err: "Player has changed on the server"}, status: 422
+		if !$transfers_active
+			render json: {err: "Transfers are Stopped"}, status: 422
 		else
-			playername = $playerdata[player.id].web_name
-			ownermoney = {id: nil, money: nil}
-# Player owned by bidder, just updating the topbid
-			if user.id == player.user_id 
-				player.topbid = bid
+			bid = params[:bid].to_i
+			user = current_user
+			league = user.league
+			sentPlayer = params[:player]
+			players = YAML::load league.players
+			player = players[sentPlayer["id"]]
+	# Player changed on server
+			unless player.value == sentPlayer[:value] && player.user_id == sentPlayer[:user_id] && player.owned == sentPlayer[:owned]
+				render json: {err: "Player has changed on the server"}, status: 422
 			else
-# Player is a free agent, not owned by anyone
-				if player.user_id.nil?
-					fee = user.money - player.value
-					user.update_attributes(money: fee) # subtracts the value of the player from user's money
+				playername = $playerdata[player.id].web_name
+				ownermoney = {id: nil, money: nil}
+	# Player owned by bidder, just updating the topbid
+				if user.id == player.user_id 
 					player.topbid = bid
-				  player.user_id = user.id
-					logmessage = "#{user.team_name} bought #{playername} for #{currency(player.value)}"
 				else
-# Bid is higher than topbid
-					owner = User.find_by_id player.user_id
-					if bid > player.topbid
-						value = (bid < (player.topbid + 100000) ? bid : (player.topbid + 100000))
+	# Player is a free agent, not owned by anyone
+					if player.user_id.nil?
+						fee = user.money - player.value
+						user.update_attributes(money: fee) # subtracts the value of the player from user's money
 						player.topbid = bid
-						fee = user.money - value
-						user.update_attributes(money: fee) # user pays for the player
-						if player.owned # owner makes a profit
-							profit = owner.money + value # get's the updated value
-							owner.update_attributes(money: profit)
-						else # owner get his money back, no profit
-							refund = owner.money + player.value # get's back what he payed
-							owner.update_attributes(money: refund)
-						end
-						player.value = value
-						player.user_id = user.id
-						player.owned = false
-						logmessage = "#{user.team_name} successfully bought #{playername} from #{owner.team_name} for #{currency(player.value)}"
+					  player.user_id = user.id
+						logmessage = "#{user.team_name} bought #{playername} for #{currency(player.value)}"
 					else
-# bid increases value of player for current owner
-						unless player.owned
-							value_increase = owner.money - (bid - player.value)
-							owner.update_attributes(money: value_increase)
-						end							
-						player.value = bid
-						logmessage = "#{user.team_name} unsuccessfully bid #{currency(bid)} on #{playername} from #{owner.team_name}"
+	# Bid is higher than topbid
+						owner = User.find_by_id player.user_id
+						if bid > player.topbid
+							value = (bid < (player.topbid + 100000) ? bid : (player.topbid + 100000))
+							player.topbid = bid
+							fee = user.money - value
+							user.update_attributes(money: fee) # user pays for the player
+							if player.owned # owner makes a profit
+								profit = owner.money + value # get's the updated value
+								owner.update_attributes(money: profit)
+							else # owner get his money back, no profit
+								refund = owner.money + player.value # get's back what he payed
+								owner.update_attributes(money: refund)
+							end
+							player.value = value
+							player.user_id = user.id
+							player.owned = false
+							logmessage = "#{user.team_name} successfully bought #{playername} from #{owner.team_name} for #{currency(player.value)}"
+						else
+	# bid increases value of player for current owner
+							unless player.owned
+								value_increase = owner.money - (bid - player.value)
+								owner.update_attributes(money: value_increase)
+							end							
+							player.value = bid
+							logmessage = "#{user.team_name} unsuccessfully bid #{currency(bid)} on #{playername} from #{owner.team_name}"
+						end
+						ownermoney = {id: owner.id, money: owner.money}
+						player.salary
+						player.sellvalue
 					end
-					ownermoney = {id: owner.id, money: owner.money}
-					player.salary
-					player.sellvalue
+					Log.create(action: "bid", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: player.value, message: logmessage)
 				end
-				Log.create(action: "bid", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: user.league_id, value: player.value, message: logmessage)
+				serialized_players = YAML::dump players
+				league.update_attributes(players: serialized_players)
+				render json: {updatedPlayer: player, usermoney: user.money, owner_id: ownermoney[:id], ownermoney: ownermoney[:money], } # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
 			end
-			serialized_players = YAML::dump players
-			league.update_attributes(players: serialized_players)
-			render json: {updatedPlayer: player, usermoney: user.money, owner_id: ownermoney[:id], ownermoney: ownermoney[:money], } # TODO: send 20 last logs/for now only update logs when visiting logs tab in view
 		end
 	end
 
 	def sell
-		p "-- In transfers#sell params: #{params}"
-		sell_id = params[:id].to_i
-		user = current_user
-		league = user.league
-		players = YAML::load league.players
-		player = players[sell_id]
-		if player.user_id == user.id
-			sellvalue = player.sell
-			user.update_attributes(money: user.money + sellvalue)
-			sellmessage = "#{user.team_name} sold #{$playerdata[sell_id].web_name} for #{currency(sellvalue)}"
-			Log.create(action: "sell", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: league.id, value: sellvalue, message: sellmessage)
-			serialized_players = YAML::dump players
-			league.update_attributes(players: serialized_players)
-			render json: {response: 'player sold', money: user.money, updatedPlayer: player}
-		else # player has been bought by someone already or couldn't be found
-			render json: {err: 'Player was no longer yours', updatedPlayer: player}, :status => 422
+		if !$transfers_active
+			render json: {err: "Transfers are Stopped"}, status: 422
+		else
+			p "-- In transfers#sell params: #{params}"
+			sell_id = params[:id].to_i
+			user = current_user
+			league = user.league
+			players = YAML::load league.players
+			player = players[sell_id]
+			if player.user_id == user.id
+				sellvalue = player.sell
+				user.update_attributes(money: user.money + sellvalue)
+				sellmessage = "#{user.team_name} sold #{$playerdata[sell_id].web_name} for #{currency(sellvalue)}"
+				Log.create(action: "sell", game_week: $current_gameweek, user_id: user.id, player_id: player.id, league_id: league.id, value: sellvalue, message: sellmessage)
+				serialized_players = YAML::dump players
+				league.update_attributes(players: serialized_players)
+				render json: {response: 'player sold', money: user.money, updatedPlayer: player}
+			else # player has been bought by someone already or couldn't be found
+				render json: {err: 'Player was no longer yours', updatedPlayer: player}, :status => 422
+			end
 		end
 	end
 
